@@ -1,4 +1,5 @@
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -25,9 +26,14 @@ public class Peer {
 
     public static void main(String[] args) throws IOException {
 
-        System.out.println("Peer Client is Running...");
-        new PeerClient().start();
+        // -----------------PEER CLIENT SECTION---------------
+        InetAddress serverAddress = InetAddress.getLocalHost();
 
+        System.out.println("Peer Client is Running...");
+        new PeerClient(serverAddress, 3000).start();
+
+
+        // -----------------PEER SERVER SECTION----------------
         int clientID = 1;
         ServerSocket peerServer = new ServerSocket(PEER_SERVER_PORT);
         System.out.println("Peer Server is Listening");
@@ -39,8 +45,33 @@ public class Peer {
     }
 
     private static class PeerClient extends Thread {
+        InetAddress serverAddress;
+        int serverPort;
+        Socket socket = null;
+        BufferedReader userInput = null;
+        BufferedReader socketInput = null;
+        PrintWriter writer = null;
+        String message;
 
-        
+
+        public PeerClient(InetAddress serverAddress, int serverPort) {
+            this.serverAddress = serverAddress;
+            this.serverPort = serverPort;
+        }
+
+        public void run(){
+            try{
+                socket = new Socket(serverAddress, serverPort);
+                userInput = new BufferedReader(new InputStreamReader(System.in));
+                socketInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            }catch (Exception e){
+
+            }
+
+        }
+
+        //Establish Connection with Server
 
     }
 
