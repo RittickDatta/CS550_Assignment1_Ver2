@@ -114,6 +114,13 @@ public class Peer {
 
         }
 
+        public ArrayList<String> getFileNames(String fileLocation){
+            String FILE_LOCATION = fileLocation;
+            ArrayList<String> fileNames = null;
+
+            return fileNames;
+        }
+
 
     }
 
