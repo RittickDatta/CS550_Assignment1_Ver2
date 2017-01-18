@@ -1,4 +1,7 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -24,23 +27,54 @@ public class IndexingServer {
         while (true) {
             Socket newConnection = server.accept();
             new ServerThread(clientID, newConnection).start();
+            System.out.println("New Connection Accepted. Client ID: " + clientID);
             clientID = clientID + 1;
-            System.out.println("New Connection Accepted. Client ID: "+clientID);
         }
     }
 
     private static class ServerThread extends Thread {
         private int clientID;
         private Socket connection;
+        private String message;
 
         public ServerThread(int clientID, Socket connection) {
             this.clientID = clientID;
             this.connection = connection;
         }
 
-        public void run(){
-            System.out.println(" INDEXING SERVER, CLIENT ID :"+clientID);
+        public void run() {
+
+            System.out.println(" INDEXING SERVER, CLIENT ID :" + clientID);
+            try {
+                BufferedReader inputStream = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                PrintWriter outputStream = new PrintWriter(connection.getOutputStream());
+
+                message = inputStream.readLine();
+                System.out.println("Message from client :"+message);
+                while (message.compareTo("QUIT")!=0){
+                    outputStream.println("Please select an Operation. 1. Register Local Files 2. Search for a File");
+                    outputStream.flush();
+                    message = inputStream.readLine();
+                }
+
+            }
+            catch (IOException e1){}
+            catch(Exception e2){}
+
         }
+
+        public String registry(ArrayList<String> fileNameList, String fileLocation){
+            String flag = null;
+
+            return flag;
+        }
+
+        public String search(String fileName){
+            String flag = null;
+
+            return flag;
+        }
+
     }
 
 }

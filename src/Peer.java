@@ -28,6 +28,7 @@ public class Peer {
 
         // -----------------PEER SERVER SECTION----------------
 
+        System.out.println("Peer Server is preparing to start...");
         System.out.println("Enter Port Number for Server: ");
         BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
         try {
@@ -35,7 +36,7 @@ public class Peer {
 
             int clientID = 1;
             ServerSocket peerServer = new ServerSocket(PEER_SERVER_PORT);
-            System.out.println("Peer Server is Listening");
+            System.out.println("Peer Server is Listening...");
 
             while (true) {
                 Socket newConnection = peerServer.accept();
@@ -67,8 +68,18 @@ public class Peer {
         public void run() {
             try {
                 socket = new Socket(serverAddress, serverPort);
-                userInput = new BufferedReader(new InputStreamReader(System.in));
+                //userInput = new BufferedReader(new InputStreamReader(System.in));
                 socketInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                writer = new PrintWriter(socket.getOutputStream());
+
+                message =socketInput.readLine();
+                while (message.compareTo("QUIT")!= 0) {
+                    writer.println("Hello from client.");
+                    writer.flush();
+
+                    String serverResponse = socketInput.readLine();
+                    System.out.println("Server response"+ serverResponse);
+                }
 
             } catch (Exception e) {
 
@@ -94,6 +105,12 @@ public class Peer {
 
 
             System.out.println(" PEER SERVER, CLIENT ID: " + clientId);
+        }
+
+        public String obtain(String fileName){
+            String flag = null;
+
+            return flag;
         }
     }
 }
