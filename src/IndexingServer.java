@@ -35,7 +35,7 @@ public class IndexingServer {
     private static class ServerThread extends Thread {
         private int clientID;
         private Socket connection;
-        private String messageFromClient;
+        private int messageFromClient;
 
         public ServerThread(int clientID, Socket connection) {
             this.clientID = clientID;
@@ -52,8 +52,21 @@ public class IndexingServer {
                 outputStream.println("Please select an Operation. 1. Register Local Files 2. Search for a File");
                 outputStream.flush();
 
-                messageFromClient = inputStream.readLine();
+                messageFromClient = Integer.parseInt(inputStream.readLine());
                 System.out.println("Message from client: "+ messageFromClient);
+                if (messageFromClient == 1){
+                    System.out.println("FILE REGISTRATION REQUEST");
+                    outputStream.println("SEND FILE NAMES");
+                    outputStream.flush();
+                }
+                else if (messageFromClient == 2){
+                    System.out.println("FILE SEARCH REQUEST");
+                }
+                else{
+                    System.out.println("INVALID OPTION");
+                    outputStream.println("Please select an Operation. 1. Register Local Files 2. Search for a File");
+                    outputStream.flush();
+                }
 
             }
             catch (IOException e1){}
