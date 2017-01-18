@@ -9,24 +9,17 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by rittick on 1/17/17.
  */
 public class Peer {
-    private static int PEER_SERVER_PORT ;
+    private static int PEER_SERVER_PORT;
     private static String File_Locations = "Files/";
 
     public Peer() {
-        System.out.println("Enter Port Number for Serer: ");
-        BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
-        try {
-            PEER_SERVER_PORT = Integer.parseInt(userInput.readLine());
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Exception while initializing SERVER_PORT");
-        }
 
     }
 
     public static void main(String[] args) throws IOException {
 
         // -----------------PEER CLIENT SECTION---------------
+
         InetAddress serverAddress = InetAddress.getLocalHost();
 
         System.out.println("Peer Client is Running...");
@@ -34,14 +27,26 @@ public class Peer {
 
 
         // -----------------PEER SERVER SECTION----------------
-        int clientID = 1;
-        ServerSocket peerServer = new ServerSocket(PEER_SERVER_PORT);
-        System.out.println("Peer Server is Listening");
 
-        while (true){
-            Socket newConnection = peerServer.accept();
-            new PeerServer(clientID, newConnection).start();
+        System.out.println("Enter Port Number for Server: ");
+        BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            PEER_SERVER_PORT = Integer.parseInt(userInput.readLine());
+
+            int clientID = 1;
+            ServerSocket peerServer = new ServerSocket(PEER_SERVER_PORT);
+            System.out.println("Peer Server is Listening");
+
+            while (true) {
+                Socket newConnection = peerServer.accept();
+                new PeerServer(clientID, newConnection).start();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Exception while initializing SERVER_PORT");
         }
+
+
     }
 
     private static class PeerClient extends Thread {
@@ -59,19 +64,18 @@ public class Peer {
             this.serverPort = serverPort;
         }
 
-        public void run(){
-            try{
+        public void run() {
+            try {
                 socket = new Socket(serverAddress, serverPort);
                 userInput = new BufferedReader(new InputStreamReader(System.in));
                 socketInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            }catch (Exception e){
+            } catch (Exception e) {
 
             }
 
         }
 
-        //Establish Connection with Server
 
     }
 
@@ -86,8 +90,10 @@ public class Peer {
             this.connection = connection;
         }
 
-        public void run(){
-            System.out.println(" PEER SERVER, CLIENT ID: "+clientId);
+        public void run() {
+
+
+            System.out.println(" PEER SERVER, CLIENT ID: " + clientId);
         }
     }
 }
