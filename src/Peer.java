@@ -3,7 +3,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by rittick on 1/17/17.
@@ -18,25 +17,30 @@ public class Peer {
 
     public static void main(String[] args) throws IOException {
 
-        // -----------------PEER CLIENT SECTION---------------
-
-        InetAddress serverAddress = InetAddress.getLocalHost();
-
-        System.out.println("Peer Client is Running...");
-        new PeerClient(serverAddress, 3000).start();
 
 
         // -----------------PEER SERVER SECTION----------------
 
-        System.out.println("Peer Server is preparing to start...");
-        System.out.println("Enter Port Number for Server: ");
-        BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
+
         try {
+
+            System.out.println("Peer Server Preparing to Start...");
+            System.out.println("Enter Port Number for Peer Server:");
+            BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
             PEER_SERVER_PORT = Integer.parseInt(userInput.readLine());
 
             int clientID = 1;
             ServerSocket peerServer = new ServerSocket(PEER_SERVER_PORT);
             System.out.println("Peer Server is Listening...");
+
+            // -----------------PEER CLIENT SECTION---------------
+
+            InetAddress serverAddress = InetAddress.getLocalHost();
+
+            System.out.println("Peer Client is Running...");
+            new PeerClient(serverAddress, 3000).start();
+
+            //-----------------------------------------------------
 
             while (true) {
                 Socket newConnection = peerServer.accept();
@@ -57,7 +61,9 @@ public class Peer {
         BufferedReader userInput = null;
         BufferedReader socketInput = null;
         PrintWriter writer = null;
-        String message;
+        String messageFromServer;
+        String messageToServer;
+        String serverResponse;
 
 
         public PeerClient(InetAddress serverAddress, int serverPort) {
@@ -68,21 +74,42 @@ public class Peer {
         public void run() {
             try {
                 socket = new Socket(serverAddress, serverPort);
-                //userInput = new BufferedReader(new InputStreamReader(System.in));
+                userInput = new BufferedReader(new InputStreamReader(System.in));
                 socketInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 writer = new PrintWriter(socket.getOutputStream());
 
-                message =socketInput.readLine();
-                while (message.compareTo("QUIT")!= 0) {
-                    writer.println("Hello from client.");
+                messageFromServer = socketInput.readLine();
+                System.out.println(messageFromServer);
+                messageToServer = userInput.readLine();
+                while  (messageToServer.compareTo("QUIT")!= 0){
+                    writer.println(messageToServer);
                     writer.flush();
-
-                    String serverResponse = socketInput.readLine();
-                    System.out.println("Server response"+ serverResponse);
+                    serverResponse = socketInput.readLine();
+                    System.out.println("Server's message:"+serverResponse);
+                    messageToServer = userInput.readLine();
                 }
 
-            } catch (Exception e) {
+            } catch(IOException e){
 
+            }
+            finally {
+                if(socket != null){
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(socketInput != null){
+                    try {
+                        socketInput.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(writer != null){
+                    writer.close();
+                }
             }
 
         }

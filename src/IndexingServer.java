@@ -35,7 +35,7 @@ public class IndexingServer {
     private static class ServerThread extends Thread {
         private int clientID;
         private Socket connection;
-        private String message;
+        private String messageFromClient;
 
         public ServerThread(int clientID, Socket connection) {
             this.clientID = clientID;
@@ -49,13 +49,11 @@ public class IndexingServer {
                 BufferedReader inputStream = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 PrintWriter outputStream = new PrintWriter(connection.getOutputStream());
 
-                message = inputStream.readLine();
-                System.out.println("Message from client :"+message);
-                while (message.compareTo("QUIT")!=0){
-                    outputStream.println("Please select an Operation. 1. Register Local Files 2. Search for a File");
-                    outputStream.flush();
-                    message = inputStream.readLine();
-                }
+                outputStream.println("Please select an Operation. 1. Register Local Files 2. Search for a File");
+                outputStream.flush();
+
+                messageFromClient = inputStream.readLine();
+                System.out.println("Message from client: "+ messageFromClient);
 
             }
             catch (IOException e1){}
