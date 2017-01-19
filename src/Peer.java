@@ -96,9 +96,17 @@ public class Peer {
                     switch (serverResponse){
                         case "SEND FILE DATA":
                             System.out.println("Preparing File Data.");
-                            messageToServer = "FILE DATA"; // call method for file data
-                            writer.println(messageToServer);
-                            writer.flush();
+
+                            String fileData = getFileData(peerFileLocation);
+
+
+                            //messageToServer = fileData;  call method for file data
+                                writer.println(fileData);
+                                writer.flush();
+
+
+                            System.out.println("File Data Sent.");
+
                             serverResponse = socketInput.readLine();
                             break;
 
@@ -141,12 +149,12 @@ public class Peer {
 
         }
 
-        public static ArrayList<String> getFileData(String path) {
-            ArrayList<String> fileData = new ArrayList<String>();
+        public static String getFileData(String path) {
+            String fileData = "";
             File file = new File(path);
             String[] list = file.list();
             for (int i = 0; i<list.length; i++)
-                fileData.add("Path: "+path+"#Filename: "+list[i]+"#Size: "+ list[i].length());
+                fileData += "Path: "+path+"#Filename: "+list[i]+"#Size:"+list[i].length()+ "!";
             return fileData;
         }
 

@@ -62,6 +62,9 @@ public class IndexingServer {
                         outputStream.println("SEND FILE DATA");
                         outputStream.flush();
                         String requestData = inputStream.readLine();
+
+                        registry(clientID, requestData);
+
                         while (requestData.compareToIgnoreCase("QUIT") != 0) {
                             outputStream.println("FILE DATA RECEIVED");
                             outputStream.flush();
@@ -91,9 +94,37 @@ public class IndexingServer {
 
         }
 
-        public String registry(ArrayList<String> fileNameList, String fileLocation) {
-            String flag = null;
+        public String registry(int clientID, String fileData) {
+            //Enter data into CHM
 
+            String flag = null;
+            ArrayList<String> files = new ArrayList<String>();
+
+
+            String[] allRecords = fileData.split("!");
+            for(String oneRecord : allRecords){
+                String[] singleRecord = oneRecord.split("#");
+                for(String field: singleRecord){
+                    if(field.contains("Filename:")){
+                        String filename = field.substring(10);
+                        System.out.println("*Filename:"+filename);
+                    }
+                    if(field.contains("Path:")){
+                        String path = field.substring(6);
+                        System.out.println("*Path: "+path);
+                    }
+                    if(field.contains("Size:")){
+                        String size = field.substring(5);
+                        System.out.println("*Size: "+size);
+
+                    }
+
+                    //System.out.println(field);
+                }
+
+            }
+
+            flag = "SUCCESS\n";
             return flag;
         }
 
