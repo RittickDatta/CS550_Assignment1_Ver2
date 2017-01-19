@@ -9,6 +9,7 @@ import java.util.ArrayList;
  */
 public class Peer {
     private static int PEER_SERVER_PORT;
+    private static String PEER_CLIENT_FILE_LOCATION;
     private static String File_Locations = "Files/";
 
     public Peer() {
@@ -36,9 +37,10 @@ public class Peer {
             // -----------------PEER CLIENT SECTION---------------
 
             InetAddress serverAddress = InetAddress.getLocalHost();
-
+            System.out.println("Enter File Location for Peer:");
+            PEER_CLIENT_FILE_LOCATION = userInput.readLine();
             System.out.println("Peer Client is Running...");
-            new PeerClient(serverAddress, 3000).start();
+            new PeerClient(serverAddress, 3000, PEER_CLIENT_FILE_LOCATION).start();
 
             //-----------------------------------------------------
 
@@ -64,11 +66,14 @@ public class Peer {
         String messageFromServer;
         String messageToServer;
         String serverResponse;
+        String peerFileLocation;
 
 
-        public PeerClient(InetAddress serverAddress, int serverPort) {
+        public PeerClient(InetAddress serverAddress, int serverPort, String peerFileLocation) {
             this.serverAddress = serverAddress;
             this.serverPort = serverPort;
+            this.peerFileLocation = peerFileLocation;
+            //System.out.println(this.peerFileLocation);
         }
 
         public void run() {
