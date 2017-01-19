@@ -13,8 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class IndexingServer {
 
     private static final int SERVER_PORT = 3000;
-    private static ConcurrentHashMap<String, ArrayList<String>> serverRegister = new ConcurrentHashMap<String, ArrayList<String>>();
-    private static ConcurrentHashMap<String, String> peerFileLocations = new ConcurrentHashMap<String, String>();
+    private static ConcurrentHashMap<Integer, String> clientIdToFilename = new ConcurrentHashMap<Integer, String>();
+    private static ConcurrentHashMap<Integer, String> clientIdToFileLocation = new ConcurrentHashMap<Integer, String>();
+    private static ConcurrentHashMap<String, Integer> fileNameToFileSize = new ConcurrentHashMap<String, Integer>();
     private static int activeConnections = 0;
 
 
@@ -96,7 +97,7 @@ public class IndexingServer {
 
         public String registry(int clientID, String fileData) {
             //Enter data into CHM
-
+            String filename = null;
             String flag = null;
             ArrayList<String> files = new ArrayList<String>();
 
@@ -105,17 +106,21 @@ public class IndexingServer {
             for(String oneRecord : allRecords){
                 String[] singleRecord = oneRecord.split("#");
                 for(String field: singleRecord){
+
                     if(field.contains("Filename:")){
-                        String filename = field.substring(10);
-                        System.out.println("*Filename:"+filename);
+                        filename = field.substring(10);
+                        clientIdToFilename.put(clientID, filename);
+                        System.out.println("FILE NAME ADDED");
                     }
                     if(field.contains("Path:")){
                         String path = field.substring(6);
-                        System.out.println("*Path: "+path);
+                        clientIdToFileLocation.put(clientID, path);
+                        System.out.println("PATH DATA ADDED");
                     }
                     if(field.contains("Size:")){
-                        String size = field.substring(5);
-                        System.out.println("*Size: "+size);
+                        int size = Integer.parseInt(field.substring(5));
+                        fileNameToFileSize.put(filename, size);
+                        System.out.println("SIZE ADDED");
 
                     }
 
