@@ -1,3 +1,4 @@
+import javax.xml.bind.SchemaOutputResolver;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -91,6 +92,27 @@ public class Peer {
                     writer.flush();
                     serverResponse = socketInput.readLine();
                     System.out.println("Server's message:"+serverResponse);
+
+                    switch (serverResponse){
+                        case "SEND FILE DATA":
+                            System.out.println("Preparing File Data.");
+                            messageToServer = "FILE DATA"; // call method for file data
+                            writer.println(messageToServer);
+                            writer.flush();
+                            serverResponse = socketInput.readLine();
+                            break;
+
+                        case "NAME OF FILE TO SEARCH":
+                            System.out.println("Enter Name of File to Search:");
+                            messageToServer = userInput.readLine();
+                            writer.println(messageToServer);
+                            writer.flush();
+                            messageFromServer = socketInput.readLine();
+                            System.out.println(messageFromServer);
+                            break;
+                    }
+
+
                     messageToServer = userInput.readLine();
                 }
 
@@ -119,11 +141,13 @@ public class Peer {
 
         }
 
-        public ArrayList<String> getFileNames(String fileLocation){
-            String FILE_LOCATION = fileLocation;
-            ArrayList<String> fileNames = null;
-
-            return fileNames;
+        public static ArrayList<String> getFileData(String path) {
+            ArrayList<String> fileData = new ArrayList<String>();
+            File file = new File(path);
+            String[] list = file.list();
+            for (int i = 0; i<list.length; i++)
+                fileData.add("Path: "+path+"#Filename: "+list[i]+"#Size: "+ list[i].length());
+            return fileData;
         }
 
 

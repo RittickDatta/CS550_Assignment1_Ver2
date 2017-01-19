@@ -19,10 +19,9 @@ public class HelperFunctions {
     public static void main(String[] args) {
         ArrayList<String> fileData = getFileData("Node1/");
         for(String s: fileData){
-            String[] split = s.split("#");
-            for(String s2 : split){
-                System.out.println(s2);
-            }
+
+                System.out.println(s);
+
         }
     }
 }

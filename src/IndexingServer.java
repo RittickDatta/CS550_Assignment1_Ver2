@@ -36,6 +36,8 @@ public class IndexingServer {
         private int clientID;
         private Socket connection;
         private int messageFromClient;
+        BufferedReader inputStream;
+        PrintWriter outputStream;
 
         public ServerThread(int clientID, Socket connection) {
             this.clientID = clientID;
@@ -44,43 +46,58 @@ public class IndexingServer {
 
         public void run() {
 
-            System.out.println(" INDEXING SERVER, CLIENT ID :" + clientID);
+            //System.out.println(" INDEXING SERVER, CLIENT ID :" + clientID);
             try {
-                BufferedReader inputStream = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                PrintWriter outputStream = new PrintWriter(connection.getOutputStream());
+                inputStream = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                outputStream = new PrintWriter(connection.getOutputStream());
 
                 outputStream.println("Please select an Operation. 1. Register Local Files 2. Search for a File");
                 outputStream.flush();
 
                 messageFromClient = Integer.parseInt(inputStream.readLine());
-                System.out.println("Message from client: "+ messageFromClient);
-                if (messageFromClient == 1){
-                    System.out.println("FILE REGISTRATION REQUEST");
-                    outputStream.println("SEND FILE NAMES");
-                    outputStream.flush();
-                }
-                else if (messageFromClient == 2){
-                    System.out.println("FILE SEARCH REQUEST");
-                }
-                else{
-                    System.out.println("INVALID OPTION");
-                    outputStream.println("Please select an Operation. 1. Register Local Files 2. Search for a File");
-                    outputStream.flush();
-                }
+                System.out.println("Message from client: " + messageFromClient);
+                switch (messageFromClient) {
+                    case 1:
+                        System.out.println("FILE REGISTRATION REQUEST");
+                        outputStream.println("SEND FILE DATA");
+                        outputStream.flush();
+                        String requestData = inputStream.readLine();
+                        while (requestData.compareToIgnoreCase("QUIT") != 0) {
+                            outputStream.println("FILE DATA RECEIVED");
+                            outputStream.flush();
+                            requestData = inputStream.readLine();
+                        }
+                        break;
 
+                    case 2:
+                        System.out.println("FILE SEARCH REQUEST");
+                        outputStream.println("NAME OF FILE TO SEARCH");
+                        outputStream.flush();
+                        String requestDataSearch = inputStream.readLine();
+                        while (requestDataSearch.compareToIgnoreCase("QUIT") != 0) {
+                            outputStream.println("FILE SEARCH DATA RECEIVED");
+                            outputStream.flush();
+                            requestDataSearch = inputStream.readLine();
+                        }
+                        break;
+
+                    default:
+                        System.out.println("INVALID OPTION");
+
+                }
+            } catch (IOException e1) {
+            } catch (Exception e2) {
             }
-            catch (IOException e1){}
-            catch(Exception e2){}
 
         }
 
-        public String registry(ArrayList<String> fileNameList, String fileLocation){
+        public String registry(ArrayList<String> fileNameList, String fileLocation) {
             String flag = null;
 
             return flag;
         }
 
-        public String search(String fileName){
+        public String search(String fileName) {
             String flag = null;
 
             return flag;
