@@ -43,7 +43,7 @@ public class Peer {
             System.out.println("Enter File Location for Peer:");
             PEER_CLIENT_FILE_LOCATION = userInput.readLine();
             System.out.println("Peer Client is Running...");
-            new PeerClient(serverAddress, 3000, PEER_CLIENT_FILE_LOCATION).start();
+            new PeerClient(serverAddress, 3000, PEER_CLIENT_FILE_LOCATION, PEER_SERVER_PORT).start();
 
             //-----------------------------------------------------
 
@@ -70,12 +70,14 @@ public class Peer {
         String messageToServer = "1";
         String serverResponse;
         String peerFileLocation;
+        int peerServerPort;
 
 
-        public PeerClient(InetAddress serverAddress, int serverPort, String peerFileLocation) {
+        public PeerClient(InetAddress serverAddress, int serverPort, String peerFileLocation, int peerServerPort) {
             this.serverAddress = serverAddress;
             this.serverPort = serverPort;
             this.peerFileLocation = peerFileLocation;
+            this.peerServerPort = peerServerPort;
             //System.out.println(this.peerFileLocation);
         }
 
@@ -90,6 +92,8 @@ public class Peer {
                 //System.out.println(messageFromServer);
                 //messageToServer = userInput.readLine();
                 //messageToServer = selectOption();
+                writer.println(peerServerPort);
+                writer.flush();
                 while  (messageToServer.compareTo("3")!= 0){
                     messageToServer = selectOption();
                     writer.println(messageToServer);

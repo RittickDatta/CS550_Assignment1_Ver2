@@ -16,6 +16,7 @@ public class IndexingServer {
     private static ConcurrentHashMap<Integer, ArrayList<String>> clientIdToFilename = new ConcurrentHashMap<Integer, ArrayList<String>>();
     private static ConcurrentHashMap<Integer, String> clientIdToFileLocation = new ConcurrentHashMap<Integer, String>();
     private static ConcurrentHashMap<String, Integer> fileNameToFileSize = new ConcurrentHashMap<String, Integer>();
+    private static ConcurrentHashMap<Integer, Integer> clientIdToPeerServer = new ConcurrentHashMap<Integer, Integer>();
     private static int activeConnections = 0;
 
 
@@ -39,6 +40,9 @@ public class IndexingServer {
         private int messageFromClient;
         BufferedReader inputStream;
         PrintWriter outputStream;
+        int clientServersPort;
+
+        private int clientServerPort;
 
         public ServerThread(int clientID, Socket connection) {
             this.clientID = clientID;
@@ -54,6 +58,10 @@ public class IndexingServer {
 
                 //outputStream.println("Please select an Operation. 1. Register Local Files 2. Search for a File");
                 //outputStream.flush();
+
+                clientServersPort = Integer.parseInt(inputStream.readLine());
+                System.out.println("Client's Server Port : "+ clientServersPort);
+                saveClientsServerPort(clientID, clientServersPort);
 
                 while (true) {
                     messageFromClient = Integer.parseInt(inputStream.readLine());
@@ -117,6 +125,10 @@ public class IndexingServer {
             }
         }
 
+        private void saveClientsServerPort(int clientID, int clientServersPort) {
+            clientIdToPeerServer.put(clientID, clientServersPort);
+            System.out.println("Peer's Server Port Saved.");
+        }
 
 
         public boolean registry(int clientID, String fileData) {
@@ -159,7 +171,7 @@ public class IndexingServer {
 
 
             for(Integer key:clientIdToFilename.keySet()){
-                System.out.println("ID: "+key+"Filename: "+clientIdToFilename.get(key));
+                System.out.println("ID: "+key+" Filename: "+clientIdToFilename.get(key));
             }
 
             boolean finalFlag = false;
