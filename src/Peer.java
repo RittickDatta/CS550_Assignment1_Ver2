@@ -130,6 +130,14 @@ public class Peer {
                             writer.flush();
                             messageFromServer = socketInput.readLine();
                             System.out.println(messageFromServer);
+
+                            //-------DOWNLOAD FILE?-------------
+
+                            System.out.println("Do you want to download file? (y/n) File will be saved in 'Downloads' directory.");
+                            String download = userInput.readLine();
+                            if(download.compareToIgnoreCase("y")==0){
+                                System.out.println("Contacting Peer To Download File...");
+                            }
                             break;
                     }
 

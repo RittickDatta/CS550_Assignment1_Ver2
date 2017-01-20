@@ -95,7 +95,7 @@ public class IndexingServer {
 
                                 //SEARCH OPERATION HERE
                                 Integer nodeId = search(requestDataSearch);
-                                outputStream.println("Client: "+nodeId+" has the file.");
+                                outputStream.println("Client: "+nodeId+" has the file. Peer server is running at port: "+ getPort(clientID));
                                 outputStream.flush();
                                 break;
                             }
@@ -130,6 +130,15 @@ public class IndexingServer {
             System.out.println("Peer's Server Port Saved.");
         }
 
+        private int getPort(int clientID){
+            for(Integer key: clientIdToPeerServer.keySet()){
+                if( key == clientID){
+                    Integer peerServerPort = clientIdToPeerServer.get(key);
+                    return peerServerPort;
+                }
+            }
+            return 0;
+        }
 
         public boolean registry(int clientID, String fileData) {
             //Enter data into CHM
