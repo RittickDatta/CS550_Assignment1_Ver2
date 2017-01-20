@@ -1,3 +1,5 @@
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+
 import javax.xml.bind.SchemaOutputResolver;
 import java.io.*;
 import java.net.InetAddress;
@@ -65,7 +67,7 @@ public class Peer {
         BufferedReader socketInput = null;
         PrintWriter writer = null;
         String messageFromServer;
-        String messageToServer;
+        String messageToServer = "1";
         String serverResponse;
         String peerFileLocation;
 
@@ -84,10 +86,12 @@ public class Peer {
                 socketInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 writer = new PrintWriter(socket.getOutputStream());
 
-                messageFromServer = socketInput.readLine();
-                System.out.println(messageFromServer);
-                messageToServer = userInput.readLine();
-                while  (messageToServer.compareTo("QUIT")!= 0){
+                //messageFromServer = socketInput.readLine();
+                //System.out.println(messageFromServer);
+                //messageToServer = userInput.readLine();
+                //messageToServer = selectOption();
+                while  (messageToServer.compareTo("3")!= 0){
+                    messageToServer = selectOption();
                     writer.println(messageToServer);
                     writer.flush();
                     serverResponse = socketInput.readLine();
@@ -108,6 +112,7 @@ public class Peer {
                             System.out.println("File Data Sent.");
 
                             serverResponse = socketInput.readLine();
+                            System.out.println(serverResponse);
                             break;
 
                         case "NAME OF FILE TO SEARCH":
@@ -121,8 +126,9 @@ public class Peer {
                     }
 
 
-                    messageToServer = userInput.readLine();
+                    //messageToServer = userInput.readLine();
                 }
+                System.out.println("Client closing connection.");
 
             } catch(IOException e){
 
@@ -156,6 +162,20 @@ public class Peer {
             for (int i = 0; i<list.length; i++)
                 fileData += "Path: "+path+"#Filename: "+list[i]+"#Size:"+list[i].length()+ "!";
             return fileData;
+        }
+
+        public static String selectOption() throws IOException {
+            String option;
+            BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
+            while (true){
+                System.out.println("Select an Operation (number, e.g. 1 or 2)");
+                System.out.println("1. Register Files");
+                System.out.println("2. Search File");
+                System.out.println("3. Quit");
+                option = userInput.readLine();
+                return option;
+            }
+
         }
 
 

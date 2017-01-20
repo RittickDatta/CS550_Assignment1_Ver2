@@ -52,75 +52,102 @@ public class IndexingServer {
                 inputStream = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 outputStream = new PrintWriter(connection.getOutputStream());
 
-                outputStream.println("Please select an Operation. 1. Register Local Files 2. Search for a File");
-                outputStream.flush();
+                //outputStream.println("Please select an Operation. 1. Register Local Files 2. Search for a File");
+                //outputStream.flush();
 
-                messageFromClient = Integer.parseInt(inputStream.readLine());
-                System.out.println("Message from client: " + messageFromClient);
-                switch (messageFromClient) {
-                    case 1:
-                        System.out.println("FILE REGISTRATION REQUEST");
-                        outputStream.println("SEND FILE DATA");
-                        outputStream.flush();
-                        String requestData = inputStream.readLine();
-
-                        registry(clientID, requestData);
-
-                        while (requestData.compareToIgnoreCase("QUIT") != 0) {
-                            outputStream.println("FILE DATA RECEIVED");
+                while (true) {
+                    messageFromClient = Integer.parseInt(inputStream.readLine());
+                    System.out.println("Message from client: " + messageFromClient);
+                    switch (messageFromClient) {
+                        case 1:
+                            System.out.println("FILE REGISTRATION REQUEST");
+                            outputStream.println("SEND FILE DATA");
                             outputStream.flush();
-                            requestData = inputStream.readLine();
-                        }
-                        break;
+                            String requestData = inputStream.readLine();
 
-                    case 2:
-                        System.out.println("FILE SEARCH REQUEST");
-                        outputStream.println("NAME OF FILE TO SEARCH");
-                        outputStream.flush();
-                        String requestDataSearch = inputStream.readLine();
-                        while (requestDataSearch.compareToIgnoreCase("QUIT") != 0) {
-                            outputStream.println("FILE SEARCH DATA RECEIVED");
+                            boolean flag = registry(clientID, requestData);
+
+                           // while (requestData.compareToIgnoreCase("QUIT") != 0) {
+                            if(flag) {
+                                outputStream.println("FILES REGISTERED");
+                                outputStream.flush();
+                            }
+                                //requestData = inputStream.readLine();
+                            //}
+                            break;
+
+                        case 2:
+                            System.out.println("FILE SEARCH REQUEST");
+                            outputStream.println("NAME OF FILE TO SEARCH");
                             outputStream.flush();
-                            requestDataSearch = inputStream.readLine();
-                        }
-                        break;
 
-                    default:
-                        System.out.println("INVALID OPTION");
+                            String requestDataSearch = inputStream.readLine();
+                            while(requestDataSearch.compareToIgnoreCase("cancel")!=0) {
+                                System.out.println(requestDataSearch);
 
+                                //SEARCH OPERATION HERE
+
+
+
+                                break;
+                            }
+                            break;
+
+                        case 3:
+                            System.out.println("QUIT REQUEST");
+                            if(connection != null){
+                                connection.close();
+                            }
+                            if(inputStream != null){
+                                inputStream.close();
+                            }
+                            if(outputStream != null){
+                                outputStream.close();
+                            }
+                            break;
+
+                        default:
+                            System.out.println("INVALID OPTION");
+
+
+                    }
                 }
-            } catch (IOException e1) {
-            } catch (Exception e2) {
-            }
+            }catch (IOException e){
 
+            }
         }
 
-        public String registry(int clientID, String fileData) {
+
+
+        public boolean registry(int clientID, String fileData) {
             //Enter data into CHM
             String filename = null;
-            String flag = null;
+            boolean[] flag = {false, false, false};
             ArrayList<String> files = new ArrayList<String>();
 
 
             String[] allRecords = fileData.split("!");
-            for(String oneRecord : allRecords){
+            for (String oneRecord : allRecords) {
                 String[] singleRecord = oneRecord.split("#");
-                for(String field: singleRecord){
+                for (String field : singleRecord) {
 
-                    if(field.contains("Filename:")){
+                    if (field.contains("Filename:")) {
                         filename = field.substring(10);
                         clientIdToFilename.put(clientID, filename);
-                        System.out.println("FILE NAME ADDED");
+                        //System.out.println("FILE NAME ADDED");
+                        flag[0] = true;
                     }
-                    if(field.contains("Path:")){
+                    if (field.contains("Path:")) {
                         String path = field.substring(6);
                         clientIdToFileLocation.put(clientID, path);
-                        System.out.println("PATH DATA ADDED");
+                        //System.out.println("PATH DATA ADDED");
+                        flag[1] = true;
                     }
-                    if(field.contains("Size:")){
+                    if (field.contains("Size:")) {
                         int size = Integer.parseInt(field.substring(5));
                         fileNameToFileSize.put(filename, size);
-                        System.out.println("SIZE ADDED");
+                        //System.out.println("SIZE ADDED");
+                        flag[2] = true;
 
                     }
 
@@ -129,8 +156,11 @@ public class IndexingServer {
 
             }
 
-            flag = "SUCCESS\n";
-            return flag;
+            boolean finalFlag = false;
+            if (flag[0] == true && flag[1] == true && flag[2] == true) {
+                finalFlag = true;
+            }
+            return finalFlag;
         }
 
         public String search(String fileName) {
