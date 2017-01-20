@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class IndexingServer {
 
     private static final int SERVER_PORT = 3000;
-    private static ConcurrentHashMap<Integer, String> clientIdToFilename = new ConcurrentHashMap<Integer, String>();
+    private static ConcurrentHashMap<Integer, ArrayList<String>> clientIdToFilename = new ConcurrentHashMap<Integer, ArrayList<String>>();
     private static ConcurrentHashMap<Integer, String> clientIdToFileLocation = new ConcurrentHashMap<Integer, String>();
     private static ConcurrentHashMap<String, Integer> fileNameToFileSize = new ConcurrentHashMap<String, Integer>();
     private static int activeConnections = 0;
@@ -123,7 +123,7 @@ public class IndexingServer {
             //Enter data into CHM
             String filename = null;
             boolean[] flag = {false, false, false};
-            //ArrayList<String> files = new ArrayList<String>();
+            ArrayList<String> files = new ArrayList<String>();
 
 
             String[] allRecords = fileData.split("!");
@@ -133,8 +133,9 @@ public class IndexingServer {
 
                     if (field.contains("Filename:")) {
                         filename = field.substring(10);
-                        System.out.println("clientID: "+clientID+" Filename: "+filename);
-                        clientIdToFilename.put(clientID, filename);
+                        //System.out.println("clientID: "+clientID+" Filename: "+filename);
+                        files.add(filename);
+                        //clientIdToFilename.put(clientID, filename);
                         //System.out.println("FILE NAME ADDED");
                         flag[0] = true;
                     }
@@ -154,6 +155,9 @@ public class IndexingServer {
                 }
             }
 
+            clientIdToFilename.put(clientID, files);
+
+
             for(Integer key:clientIdToFilename.keySet()){
                 System.out.println("ID: "+key+"Filename: "+clientIdToFilename.get(key));
             }
@@ -168,12 +172,10 @@ public class IndexingServer {
         public Integer search(String fileName) {
             Integer nodeID = null;
             for(Integer key : clientIdToFilename.keySet()){
-                String currentFile = clientIdToFilename.get(key);
-                System.out.println(currentFile);
-                if(currentFile.equals(fileName)){
+                ArrayList<String> files = clientIdToFilename.get(key);
+                if(files.contains(fileName)){
                     nodeID = key;
-                    System.out.println(nodeID);
-                    return  nodeID;
+                    return nodeID;
                 }
             }
             return nodeID;
