@@ -57,7 +57,7 @@ public class IndexingServer {
 
                 while (true) {
                     messageFromClient = Integer.parseInt(inputStream.readLine());
-                    System.out.println("Message from client: " + messageFromClient);
+                    //System.out.println("Message from client: " + messageFromClient);
                     switch (messageFromClient) {
                         case 1:
                             System.out.println("FILE REGISTRATION REQUEST");
@@ -86,9 +86,9 @@ public class IndexingServer {
                                 System.out.println(requestDataSearch);
 
                                 //SEARCH OPERATION HERE
-
-
-
+                                Integer nodeId = search(requestDataSearch);
+                                outputStream.println("Client: "+nodeId+" has the file.");
+                                outputStream.flush();
                                 break;
                             }
                             break;
@@ -123,7 +123,7 @@ public class IndexingServer {
             //Enter data into CHM
             String filename = null;
             boolean[] flag = {false, false, false};
-            ArrayList<String> files = new ArrayList<String>();
+            //ArrayList<String> files = new ArrayList<String>();
 
 
             String[] allRecords = fileData.split("!");
@@ -133,6 +133,7 @@ public class IndexingServer {
 
                     if (field.contains("Filename:")) {
                         filename = field.substring(10);
+                        System.out.println("clientID: "+clientID+" Filename: "+filename);
                         clientIdToFilename.put(clientID, filename);
                         //System.out.println("FILE NAME ADDED");
                         flag[0] = true;
@@ -150,10 +151,11 @@ public class IndexingServer {
                         flag[2] = true;
 
                     }
-
-                    //System.out.println(field);
                 }
+            }
 
+            for(Integer key:clientIdToFilename.keySet()){
+                System.out.println("ID: "+key+"Filename: "+clientIdToFilename.get(key));
             }
 
             boolean finalFlag = false;
@@ -163,10 +165,18 @@ public class IndexingServer {
             return finalFlag;
         }
 
-        public String search(String fileName) {
-            String flag = null;
-
-            return flag;
+        public Integer search(String fileName) {
+            Integer nodeID = null;
+            for(Integer key : clientIdToFilename.keySet()){
+                String currentFile = clientIdToFilename.get(key);
+                System.out.println(currentFile);
+                if(currentFile.equals(fileName)){
+                    nodeID = key;
+                    System.out.println(nodeID);
+                    return  nodeID;
+                }
+            }
+            return nodeID;
         }
 
     }

@@ -97,6 +97,10 @@ public class Peer {
                     serverResponse = socketInput.readLine();
                     System.out.println("Server's message:"+serverResponse);
 
+                    if(serverResponse==null){
+                        break;
+                    }
+
                     switch (serverResponse){
                         case "SEND FILE DATA":
                             System.out.println("Preparing File Data.");
