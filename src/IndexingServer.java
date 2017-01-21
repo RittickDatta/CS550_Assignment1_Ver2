@@ -152,6 +152,7 @@ public class IndexingServer {
 
         public boolean registry(int clientID, String fileData) {
             //Enter data into CHM
+            boolean finalFlag = false;
             String filename = null;
             boolean[] flag = {false, false, false};
             ArrayList<String> files = new ArrayList<String>();
@@ -160,32 +161,10 @@ public class IndexingServer {
             String[] allRecords = fileData.split("!");
             for (String oneRecord : allRecords) {
                 String[] singleRecord = oneRecord.split("#");
-                for (String field : singleRecord) {
+                files.add(singleRecord[0]);
+                fileNameToLocation.put(singleRecord[0],singleRecord[1]);
 
-                    if (field.contains("Filename:")) {
-                        filename = field.substring(10);
-                        //System.out.println("clientID: "+clientID+" Filename: "+filename);
-                        files.add(filename);
-                        //clientIdToFilename.put(clientID, filename);
-                        //System.out.println("FILE NAME ADDED");
-                        fileNameToLocation.put(filename,"Node"+clientID+"/Myfiles/");
-                        flag[0] = true;
-                    }
-                    if (field.contains("Path:")) {
-                        String path = field.substring(6);
-                        //System.out.println(path);
-                        clientIdToFileLocation.put(clientID, path);
-                        //System.out.println("PATH DATA ADDED");
-                        flag[1] = true;
-                    }
-                    if (field.contains("Size:")) {
-                        int size = Integer.parseInt(field.substring(5));
-                        fileNameToFileSize.put(filename, size);
-                        //System.out.println("SIZE ADDED");
-                        flag[2] = true;
-
-                    }
-                }
+                finalFlag = true;
             }
 
             clientIdToFilename.put(clientID, files);
@@ -195,10 +174,9 @@ public class IndexingServer {
                 System.out.println("ID: "+key+" Filename: "+clientIdToFilename.get(key));
             }
 
-            boolean finalFlag = false;
-            if (flag[0] == true && flag[1] == true && flag[2] == true) {
+            /*if (flag[0] == true && flag[1] == true && flag[2] == true) {
                 finalFlag = true;
-            }
+            }*/
             return finalFlag;
         }
 

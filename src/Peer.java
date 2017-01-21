@@ -51,7 +51,7 @@ public class Peer {
 
             while (true) {
                 Socket newConnection = peerServer.accept();
-                new PeerServer(clientID, newConnection, FILE_LOCATION).start();
+                new PeerServer(clientID, newConnection).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -135,15 +135,12 @@ public class Peer {
                             writer.println(messageToServer);
                             writer.flush();
                             messageFromServer = socketInput.readLine();
-                            System.out.println(messageFromServer);
+                            System.out.println(messageFromServer); //TODO
                             String portAndLocation = messageFromServer.substring(messageFromServer.length() - 27);
                             String Location = portAndLocation.substring(portAndLocation.length()-23);
-                            System.out.println(Location);
                             System.out.println("Location: "+Location.substring(9));
                             Integer portNumber = Integer.parseInt(portAndLocation.substring(0,4));
                             System.out.println("Port: "+portNumber);
-                            //Integer portNumber = Integer.parseInt(messageFromServer.substring(messageFromServer.length() - 4));
-                            //System.out.println(portNumber);
 
                             //-------DOWNLOAD FILE?-------------
 
@@ -155,14 +152,13 @@ public class Peer {
                                 System.out.println("Contacting Peer To Download File...");
                                 socketForPeerServer = new Socket(serverAddress, portNumber);
                                 writerDownload = new PrintWriter(socketForPeerServer.getOutputStream());
-                                writerDownload.println(fileToDownload);
+                                writerDownload.println(Location+fileToDownload);
                                 writerDownload.flush();
                             }
                             break;
                     }
 
 
-                    //messageToServer = userInput.readLine();
                 }
                 System.out.println("Client closing connection.");
 
@@ -195,7 +191,7 @@ public class Peer {
             File file = new File(path);
             String[] list = file.list();
             for (int i = 0; i < list.length; i++)
-                fileData += "Path: " + path + "#Filename: " + list[i] + "#Size:" + list[i].length() + "!";
+                fileData += list[i]+ "#" + path  + "!";
             return fileData;
         }
 
@@ -221,14 +217,13 @@ public class Peer {
 
         private int clientId;
         private Socket connection;
-        private String fileLocation;
         private BufferedReader inputStream;
         private PrintWriter writerServer;
 
-        public PeerServer(int clientId, Socket connection, String fileLocation) {
+        public PeerServer(int clientId, Socket connection) {
             this.clientId = clientId;
             this.connection = connection;
-            this.fileLocation = fileLocation;
+
         }
 
         public void run() {
@@ -236,10 +231,10 @@ public class Peer {
                 inputStream = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 writerServer = new PrintWriter(connection.getOutputStream());
 
-                String messageFromPeerClient = inputStream.readLine();
-                System.out.println(messageFromPeerClient);
-                fileLocation = fileLocation+messageFromPeerClient;
-                System.out.println("Full file address :" + fileLocation);
+                String fullFileAddress = inputStream.readLine();
+                System.out.println(fullFileAddress);
+//                fileLocation = fileLocation+messageFromPeerClient;
+                System.out.println("Full file address :" + fullFileAddress);
 
                 System.out.println(" PEER SERVER, CLIENT ID: " + clientId);
             }catch (IOException e){
