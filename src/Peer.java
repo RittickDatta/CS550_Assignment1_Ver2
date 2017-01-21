@@ -5,6 +5,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.Buffer;
 import java.util.ArrayList;
 
 /**
@@ -13,14 +14,13 @@ import java.util.ArrayList;
 public class Peer {
     private static int PEER_SERVER_PORT;
     private static String PEER_CLIENT_FILE_LOCATION;
-    private static String File_Locations = "Files/";
+    private static String FILE_LOCATION = "/Myfiles/";
 
     public Peer() {
 
     }
 
     public static void main(String[] args) throws IOException {
-
 
 
         // -----------------PEER SERVER SECTION----------------
@@ -42,6 +42,8 @@ public class Peer {
             InetAddress serverAddress = InetAddress.getLocalHost();
             System.out.println("Enter File Location for Peer:");
             PEER_CLIENT_FILE_LOCATION = userInput.readLine();
+            FILE_LOCATION = PEER_CLIENT_FILE_LOCATION.substring(0, 5) + FILE_LOCATION;
+            System.out.println(FILE_LOCATION);
             System.out.println("Peer Client is Running...");
             new PeerClient(serverAddress, 3000, PEER_CLIENT_FILE_LOCATION, PEER_SERVER_PORT).start();
 
@@ -49,7 +51,7 @@ public class Peer {
 
             while (true) {
                 Socket newConnection = peerServer.accept();
-                new PeerServer(clientID, newConnection).start();
+                new PeerServer(clientID, newConnection, FILE_LOCATION).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -63,6 +65,7 @@ public class Peer {
         InetAddress serverAddress;
         int serverPort;
         Socket socket = null;
+        Socket socketForPeerServer = null;
         BufferedReader userInput = null;
         BufferedReader socketInput = null;
         PrintWriter writer = null;
@@ -94,18 +97,18 @@ public class Peer {
                 //messageToServer = selectOption();
                 writer.println(peerServerPort);
                 writer.flush();
-                while  (messageToServer.compareTo("3")!= 0){
+                while (messageToServer.compareTo("3") != 0) {
                     messageToServer = selectOption();
                     writer.println(messageToServer);
                     writer.flush();
                     serverResponse = socketInput.readLine();
-                    System.out.println("Server's message:"+serverResponse);
+                    System.out.println("Server's message:" + serverResponse);
 
-                    if(serverResponse==null){
+                    if (serverResponse == null) {
                         break;
                     }
 
-                    switch (serverResponse){
+                    switch (serverResponse) {
                         case "SEND FILE DATA":
                             System.out.println("Preparing File Data.");
 
@@ -113,8 +116,8 @@ public class Peer {
 
 
                             //messageToServer = fileData;  call method for file data
-                                writer.println(fileData);
-                                writer.flush();
+                            writer.println(fileData);
+                            writer.flush();
 
 
                             System.out.println("File Data Sent.");
@@ -126,17 +129,34 @@ public class Peer {
                         case "NAME OF FILE TO SEARCH":
                             System.out.println("Enter Name of File to Search:");
                             messageToServer = userInput.readLine();
+
+                            String fileToDownload = messageToServer;
+
                             writer.println(messageToServer);
                             writer.flush();
                             messageFromServer = socketInput.readLine();
                             System.out.println(messageFromServer);
+                            String portAndLocation = messageFromServer.substring(messageFromServer.length() - 27);
+                            String Location = portAndLocation.substring(portAndLocation.length()-23);
+                            System.out.println(Location);
+                            System.out.println("Location: "+Location.substring(9));
+                            Integer portNumber = Integer.parseInt(portAndLocation.substring(0,4));
+                            System.out.println("Port: "+portNumber);
+                            //Integer portNumber = Integer.parseInt(messageFromServer.substring(messageFromServer.length() - 4));
+                            //System.out.println(portNumber);
 
                             //-------DOWNLOAD FILE?-------------
 
+                            PrintWriter writerDownload = null;
+
                             System.out.println("Do you want to download file? (y/n) File will be saved in 'Downloads' directory.");
                             String download = userInput.readLine();
-                            if(download.compareToIgnoreCase("y")==0){
+                            if (download.compareToIgnoreCase("y") == 0) {
                                 System.out.println("Contacting Peer To Download File...");
+                                socketForPeerServer = new Socket(serverAddress, portNumber);
+                                writerDownload = new PrintWriter(socketForPeerServer.getOutputStream());
+                                writerDownload.println(fileToDownload);
+                                writerDownload.flush();
                             }
                             break;
                     }
@@ -146,25 +166,24 @@ public class Peer {
                 }
                 System.out.println("Client closing connection.");
 
-            } catch(IOException e){
+            } catch (IOException e) {
 
-            }
-            finally {
-                if(socket != null){
+            } finally {
+                if (socket != null) {
                     try {
                         socket.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-                if(socketInput != null){
+                if (socketInput != null) {
                     try {
                         socketInput.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-                if(writer != null){
+                if (writer != null) {
                     writer.close();
                 }
             }
@@ -175,15 +194,15 @@ public class Peer {
             String fileData = "";
             File file = new File(path);
             String[] list = file.list();
-            for (int i = 0; i<list.length; i++)
-                fileData += "Path: "+path+"#Filename: "+list[i]+"#Size:"+list[i].length()+ "!";
+            for (int i = 0; i < list.length; i++)
+                fileData += "Path: " + path + "#Filename: " + list[i] + "#Size:" + list[i].length() + "!";
             return fileData;
         }
 
         public static String selectOption() throws IOException {
             String option;
             BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
-            while (true){
+            while (true) {
                 System.out.println("Select an Operation (number, e.g. 1 or 2)");
                 System.out.println("1. Register Files");
                 System.out.println("2. Search File");
@@ -202,19 +221,36 @@ public class Peer {
 
         private int clientId;
         private Socket connection;
+        private String fileLocation;
+        private BufferedReader inputStream;
+        private PrintWriter writerServer;
 
-        public PeerServer(int clientId, Socket connection) {
+        public PeerServer(int clientId, Socket connection, String fileLocation) {
             this.clientId = clientId;
             this.connection = connection;
+            this.fileLocation = fileLocation;
         }
 
         public void run() {
+            try {
+                inputStream = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                writerServer = new PrintWriter(connection.getOutputStream());
 
+                String messageFromPeerClient = inputStream.readLine();
+                System.out.println(messageFromPeerClient);
+                fileLocation = fileLocation+messageFromPeerClient;
+                System.out.println("Full file address :" + fileLocation);
 
-            System.out.println(" PEER SERVER, CLIENT ID: " + clientId);
+                System.out.println(" PEER SERVER, CLIENT ID: " + clientId);
+            }catch (IOException e){
+
+            }
+            finally {
+
+            }
         }
 
-        public String obtain(String fileName){
+        public String obtain(String fileName) {
             String flag = null;
 
             return flag;

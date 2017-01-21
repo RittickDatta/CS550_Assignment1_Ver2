@@ -17,6 +17,7 @@ public class IndexingServer {
     private static ConcurrentHashMap<Integer, String> clientIdToFileLocation = new ConcurrentHashMap<Integer, String>();
     private static ConcurrentHashMap<String, Integer> fileNameToFileSize = new ConcurrentHashMap<String, Integer>();
     private static ConcurrentHashMap<Integer, Integer> clientIdToPeerServer = new ConcurrentHashMap<Integer, Integer>();
+    private static ConcurrentHashMap<String, String> fileNameToLocation = new ConcurrentHashMap<String, String>();
     private static int activeConnections = 0;
 
 
@@ -95,7 +96,7 @@ public class IndexingServer {
 
                                 //SEARCH OPERATION HERE
                                 Integer nodeId = search(requestDataSearch);
-                                outputStream.println("Client: "+nodeId+" has the file. Peer server is running at port: "+ getPort(clientID));
+                                outputStream.println("Client: "+nodeId+" has the file. Peer server is running at port:"+ getPort(clientID) +"Location:"+ getLocation(requestDataSearch));
                                 outputStream.flush();
                                 break;
                             }
@@ -123,6 +124,15 @@ public class IndexingServer {
             }catch (IOException e){
 
             }
+        }
+
+        private String getLocation(String fileName) {
+            for(String name: fileNameToLocation.keySet()){
+                if(name.equals(fileName)){
+                    return fileNameToLocation.get(name);
+                }
+            }
+            return "";
         }
 
         private void saveClientsServerPort(int clientID, int clientServersPort) {
@@ -158,10 +168,12 @@ public class IndexingServer {
                         files.add(filename);
                         //clientIdToFilename.put(clientID, filename);
                         //System.out.println("FILE NAME ADDED");
+                        fileNameToLocation.put(filename,"Node"+clientID+"/Myfiles/");
                         flag[0] = true;
                     }
                     if (field.contains("Path:")) {
                         String path = field.substring(6);
+                        //System.out.println(path);
                         clientIdToFileLocation.put(clientID, path);
                         //System.out.println("PATH DATA ADDED");
                         flag[1] = true;
