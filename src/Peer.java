@@ -278,12 +278,21 @@ public class Peer {
                 writerServer = new PrintWriter(connection.getOutputStream());
                 output = new BufferedOutputStream(connection.getOutputStream());
                 String fullFileAddress = inputStream.readLine();
+
                 System.out.println(fullFileAddress);
                 System.out.println("Full file address :" + fullFileAddress);
                 System.out.println(" PEER SERVER, CLIENT ID: " + clientId);
+
                 //TODO
                 //Sending File
-                if(output != null){
+
+                boolean fileSent = obtain(inputStream, writerServer, output, fullFileAddress);
+
+                if(fileSent){
+                    System.out.println("File Successfully Sent.");
+                }
+
+             /*   if(output != null){
                     File file = new File(fullFileAddress);
                     byte[] byteArray = new byte[(int) file.length()];
                     fileInputStream = new BufferedInputStream(new FileInputStream(file));
@@ -295,7 +304,7 @@ public class Peer {
 
                     writerServer.println("FILE SUCCESSFULLY SENT.");
                     writerServer.flush();
-                }
+                }*/
 
             }catch (IOException e){
 
@@ -305,8 +314,32 @@ public class Peer {
             }
         }
 
-        public String obtain(String fileName) {
-            String flag = null;
+        public boolean obtain(BufferedReader inputStream , PrintWriter writerServer, BufferedOutputStream output, String fullFileAddress) {
+            boolean flag = false;
+
+            try {
+
+
+                if (output != null) {
+                    File file = new File(fullFileAddress);
+                    byte[] byteArray = new byte[(int) file.length()];
+                    fileInputStream = new BufferedInputStream(new FileInputStream(file));
+                    fileInputStream.read(byteArray, 0, byteArray.length);
+                    output.write(byteArray, 0, byteArray.length);
+                    output.flush();
+                    output.close();
+                    connection.close();
+
+                    writerServer.println("FILE SUCCESSFULLY SENT.");
+                    writerServer.flush();
+                    flag = true;
+                }
+
+            }catch (IOException e){
+
+            }
+
+
 
             return flag;
         }
