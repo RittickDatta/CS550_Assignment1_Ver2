@@ -41,8 +41,9 @@ public class Peer {
             // -----------------PEER CLIENT SECTION---------------
 
             InetAddress serverAddress = InetAddress.getLocalHost();
-            System.out.println("Enter File Location for Peer:");
+            System.out.println("Enter Node Number for Peer: (e.g. Node1, Node2 etc.)");
             PEER_CLIENT_FILE_LOCATION = userInput.readLine();
+            PEER_CLIENT_FILE_LOCATION += "/Myfiles/";
 //            System.out.println("Enter Download Location for Peer:");
             FILE_DOWNLOAD_LOCATION = PEER_CLIENT_FILE_LOCATION.substring(0,6)+"Downloads/";
             System.out.println(FILE_DOWNLOAD_LOCATION);
@@ -72,6 +73,7 @@ public class Peer {
         Socket socketForPeerServer = null;
         BufferedReader userInput = null;
         BufferedReader socketInput = null;
+        BufferedReader socketPeerServerInput = null;
         PrintWriter writer = null;
         String messageFromServer;
         String messageToServer = "1";
@@ -164,6 +166,8 @@ public class Peer {
                                 writerDownload.println(Location+fileToDownload);
                                 writerDownload.flush();
 
+                                socketPeerServerInput = new BufferedReader(new InputStreamReader(socketForPeerServer.getInputStream()));
+
                                 byte[] byteArray = new byte[1];
                                 int bytesRead;
                                 input = socketForPeerServer.getInputStream();
@@ -184,11 +188,16 @@ public class Peer {
                                         bufferedOStream.flush();
                                         bufferedOStream.close();
                                         socketForPeerServer.close();
-
+                                        if(socketForPeerServer == null){
+                                            break;
+                                        }
                                     }catch (IOException e){
 
                                     }
                                 }
+                                String peerServerInput = socketPeerServerInput.readLine();
+                                System.out.println(peerServerInput);
+
                             }
                             break;
                     }
@@ -272,7 +281,7 @@ public class Peer {
                 System.out.println(fullFileAddress);
                 System.out.println("Full file address :" + fullFileAddress);
                 System.out.println(" PEER SERVER, CLIENT ID: " + clientId);
-
+                //TODO
                 //Sending File
                 if(output != null){
                     File file = new File(fullFileAddress);
@@ -283,6 +292,9 @@ public class Peer {
                     output.flush();
                     output.close();
                     connection.close();
+
+                    writerServer.println("FILE SUCCESSFULLY SENT.");
+                    writerServer.flush();
                 }
 
             }catch (IOException e){
