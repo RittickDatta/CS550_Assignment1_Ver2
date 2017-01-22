@@ -135,10 +135,12 @@ public class Peer {
                             break;
 
                         case "NAME OF FILE TO SEARCH":
+                            messageToServer = "";
                             System.out.println("Enter Name of File to Search:");
                             messageToServer = userInput.readLine();
 
-                            FILE_DOWNLOAD_LOCATION += messageToServer;
+                            String FILE_DOWNLOAD_LOCATION_copy = FILE_DOWNLOAD_LOCATION;
+                            FILE_DOWNLOAD_LOCATION_copy += messageToServer;
 
                             String fileToDownload = messageToServer;
 
@@ -176,7 +178,7 @@ public class Peer {
 
                                     BufferedOutputStream bufferedOStream = null;
                                     try {
-                                        bufferedOStream = new BufferedOutputStream(new FileOutputStream(FILE_DOWNLOAD_LOCATION));
+                                        bufferedOStream = new BufferedOutputStream(new FileOutputStream(FILE_DOWNLOAD_LOCATION_copy));
                                         bytesRead = input.read(byteArray, 0, byteArray.length);
 
                                         do {
@@ -186,17 +188,15 @@ public class Peer {
 
                                         bufferedOStream.write(byteOutputStream.toByteArray());
                                         bufferedOStream.flush();
-                                        bufferedOStream.close();
-                                        socketForPeerServer.close();
-                                        if(socketForPeerServer == null){
-                                            break;
-                                        }
+                                        //bufferedOStream.close();
+                                        //socketForPeerServer.close();
+                                        //String peerServerInput = socketPeerServerInput.readLine();
+                                        //System.out.println(peerServerInput);
+
                                     }catch (IOException e){
 
                                     }
                                 }
-                                String peerServerInput = socketPeerServerInput.readLine();
-                                System.out.println(peerServerInput);
 
                             }
                             break;
@@ -279,43 +279,48 @@ public class Peer {
                 output = new BufferedOutputStream(connection.getOutputStream());
                 String fullFileAddress = inputStream.readLine();
 
-                System.out.println(fullFileAddress);
+//                System.out.println(fullFileAddress);
                 System.out.println("Full file address :" + fullFileAddress);
                 System.out.println(" PEER SERVER, CLIENT ID: " + clientId);
 
                 //TODO
                 //Sending File
 
-                boolean fileSent = obtain(inputStream, writerServer, output, fullFileAddress);
+                obtain(inputStream, writerServer, output, fullFileAddress);
 
-                if(fileSent){
+               // if(fileSent){
                     System.out.println("File Successfully Sent.");
-                }
+               // }
 
-             /*   if(output != null){
-                    File file = new File(fullFileAddress);
-                    byte[] byteArray = new byte[(int) file.length()];
-                    fileInputStream = new BufferedInputStream(new FileInputStream(file));
-                    fileInputStream.read(byteArray,0,byteArray.length);
-                    output.write(byteArray, 0, byteArray.length);
-                    output.flush();
-                    output.close();
-                    connection.close();
 
-                    writerServer.println("FILE SUCCESSFULLY SENT.");
-                    writerServer.flush();
-                }*/
 
             }catch (IOException e){
 
             }
             finally {
+                if(inputStream != null){
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(writerServer != null){
+                    writerServer.close();
+                }
+                if(output != null){
+                    try {
+                        output.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
 
             }
         }
 
-        public boolean obtain(BufferedReader inputStream , PrintWriter writerServer, BufferedOutputStream output, String fullFileAddress) {
-            boolean flag = false;
+        public void obtain(BufferedReader inputStream , PrintWriter writerServer, BufferedOutputStream output, String fullFileAddress) {
+           // boolean flag = false;
 
             try {
 
@@ -327,12 +332,13 @@ public class Peer {
                     fileInputStream.read(byteArray, 0, byteArray.length);
                     output.write(byteArray, 0, byteArray.length);
                     output.flush();
-                    output.close();
-                    connection.close();
+                    //output.close();
+                    //connection.close();
 
                     writerServer.println("FILE SUCCESSFULLY SENT.");
                     writerServer.flush();
-                    flag = true;
+                   // flag = true;
+                    //return flag;
                 }
 
             }catch (IOException e){
@@ -341,7 +347,7 @@ public class Peer {
 
 
 
-            return flag;
+            //return flag;
         }
     }
 }
