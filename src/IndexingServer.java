@@ -18,7 +18,11 @@ public class IndexingServer {
     private static ConcurrentHashMap<String, Integer> fileNameToFileSize = new ConcurrentHashMap<String, Integer>();
     private static ConcurrentHashMap<Integer, Integer> clientIdToPeerServer = new ConcurrentHashMap<Integer, Integer>();
     private static ConcurrentHashMap<String, String> fileNameToLocation = new ConcurrentHashMap<String, String>();
+
+    private static ConcurrentHashMap<Integer, String> bigRegister = new ConcurrentHashMap<>();
+
     private static int activeConnections = 0;
+    private static int serialNumber = 1;
 
 
     public static void main(String[] args) throws IOException {
@@ -76,12 +80,12 @@ public class IndexingServer {
 
                             boolean flag = registry(clientID, requestData);
 
-                           // while (requestData.compareToIgnoreCase("QUIT") != 0) {
+                            // while (requestData.compareToIgnoreCase("QUIT") != 0) {
                             if(flag) {
                                 outputStream.println("FILES REGISTERED");
                                 outputStream.flush();
                             }
-                                //requestData = inputStream.readLine();
+                            //requestData = inputStream.readLine();
                             //}
                             break;
 
@@ -95,8 +99,9 @@ public class IndexingServer {
                                 System.out.println(requestDataSearch);
 
                                 //SEARCH OPERATION HERE
-                                Integer nodeId = search(requestDataSearch);
-                                outputStream.println("Client: "+nodeId+" has the file. Peer server is running at port:"+ getPort(clientID) +"Location:"+ getLocation(requestDataSearch));
+                                String searchResult = search(requestDataSearch);
+                                //outputStream.println("Client: "+nodeId+" has the file. Peer server is running at port:"+ getPort(clientID) +"Location:"+ getLocation(requestDataSearch));
+                                outputStream.println(searchResult);
                                 outputStream.flush();
                                 break;
                             }
@@ -153,10 +158,8 @@ public class IndexingServer {
         public boolean registry(int clientID, String fileData) {
             //Enter data into CHM
             boolean finalFlag = false;
-            String filename = null;
-            boolean[] flag = {false, false, false};
             ArrayList<String> files = new ArrayList<String>();
-
+            int port = getPort(clientID);
 
             String[] allRecords = fileData.split("!");
             for (String oneRecord : allRecords) {
@@ -164,35 +167,44 @@ public class IndexingServer {
                 files.add(singleRecord[0]);
                 fileNameToLocation.put(singleRecord[0],singleRecord[1]);
 
+                // Client ID, Port, Location and Filename
+                String bigString = clientID+"#"+port+"#"+singleRecord[1]+"#"+singleRecord[0];
+                bigRegister.put(serialNumber, bigString);
+                serialNumber += 1;
                 finalFlag = true;
             }
 
             clientIdToFilename.put(clientID, files);
 
 
-            for(Integer key:clientIdToFilename.keySet()){
-                System.out.println("ID: "+key+" Filename: "+clientIdToFilename.get(key));
+            for(Integer key:bigRegister.keySet()){
+                System.out.println("Serial Number : "+key+" Value: "+bigRegister.get(key));
             }
 
-            /*if (flag[0] == true && flag[1] == true && flag[2] == true) {
-                finalFlag = true;
-            }*/
             return finalFlag;
         }
 
-        public Integer search(String fileName) {
-            Integer nodeID = null;
-            for(Integer key : clientIdToFilename.keySet()){
+        public String search(String fileName) {
+            /*for(Integer key : clientIdToFilename.keySet()){
                 ArrayList<String> files = clientIdToFilename.get(key);
                 if(files.contains(fileName)){
                     nodeID = key;
                     return nodeID;
                 }
+            }*/
+
+            String bigString = "";
+            for(Integer key: bigRegister.keySet()){
+                String currentRecord = bigRegister.get(key);
+                String[] recordPieces = currentRecord.split("#");
+                if(fileName.equals(recordPieces[recordPieces.length-1])){
+                    bigString += currentRecord + "!";
+                }
             }
-            return nodeID;
+
+            return bigString;
         }
 
     }
 
 }
-

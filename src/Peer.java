@@ -6,7 +6,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.Buffer;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by rittick on 1/17/17.
@@ -16,6 +17,8 @@ public class Peer {
     private static String PEER_CLIENT_FILE_LOCATION;
     private static String FILE_LOCATION = "/Myfiles/";
     private static String FILE_DOWNLOAD_LOCATION;
+    private static HashMap<Integer, Integer> clientIdToPort = new HashMap<>();
+    private static HashMap<Integer, String> portToLocation = new HashMap<>();
 
     public Peer() {
 
@@ -147,12 +150,20 @@ public class Peer {
                             writer.println(messageToServer);
                             writer.flush();
                             messageFromServer = socketInput.readLine();
-                            System.out.println(messageFromServer); //TODO
-                            String portAndLocation = messageFromServer.substring(messageFromServer.length() - 27);
-                            String Location = portAndLocation.substring(portAndLocation.length() - 23);
-                            System.out.println("Location: " + Location.substring(9));
-                            Integer portNumber = Integer.parseInt(portAndLocation.substring(0, 4));
-                            System.out.println("Port: " + portNumber);
+                            System.out.println(messageFromServer);
+
+                            handleServerResult(messageFromServer);
+
+                            System.out.println("Enter Client Number to Download File:");
+                            Integer clientNumber = Integer.parseInt(userInput.readLine());
+
+                            System.out.println("Enter Port Number of Client to Download File:");
+                            Integer portNumber = Integer.parseInt(userInput.readLine());
+
+                            System.out.println("Enter Location of Client to Download File:");
+                            String Location = userInput.readLine();
+
+
 
                             //-------DOWNLOAD FILE?-------------
 
@@ -161,6 +172,7 @@ public class Peer {
                             System.out.println("Do you want to download file? (y/n) File will be saved in 'Downloads' directory.");
                             String download = userInput.readLine();
                             if (download.compareToIgnoreCase("y") == 0) {
+
                                 System.out.println("Contacting Peer To Download File...");
                                 //Receive file below.
                                 socketForPeerServer = new Socket(serverAddress, portNumber);
@@ -228,6 +240,19 @@ public class Peer {
                 }
             }
 
+        }
+
+
+
+
+        private void handleServerResult(String messageFromServer) {
+            String[] fileLocations = messageFromServer.split("!");
+            for(String oneRecord: fileLocations){
+                String[] fields = oneRecord.split("#");
+                System.out.println("Client ID: "+fields[0]+" Port: "+fields[1]+" Location: "+fields[2]+" File Name: "+fields[3]);
+               // clientIdToPort.put(Integer.parseInt(fields[0]), Integer.parseInt(fields[1]));
+               // portToLocation.put(Integer.parseInt(fields[1]), fields[2]);
+            }
         }
 
         public static String getFileData(String path) {
@@ -322,7 +347,7 @@ public class Peer {
             try {
 
                 if (output != null) {
-                    fullFileAddress = fullFileAddress.substring(9);
+                    //fullFileAddress = fullFileAddress.substring(9);
                     File file = new File(fullFileAddress);
                     System.out.println("File Address: "+ fullFileAddress);
                     byte[] byteArray = new byte[(int) file.length()];
@@ -361,4 +386,3 @@ public class Peer {
         }
     }
 }
-
