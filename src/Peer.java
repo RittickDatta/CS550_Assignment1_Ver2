@@ -152,6 +152,9 @@ public class Peer {
                             messageFromServer = socketInput.readLine();
                             System.out.println(messageFromServer);
 
+                            if(messageFromServer.compareTo("FILE NOT FOUND. CLIENT HAS UNREGISTERED.")==0) {
+                                break;
+                            }
                             handleServerResult(messageFromServer);
 
                             System.out.println("Enter Client Number to Download File:");
@@ -212,6 +215,8 @@ public class Peer {
 
                             }
                             break;
+                        case "FILE NOT FOUND. CLIENT HAS UNREGISTERED.":
+                            System.out.println("File Not Found at Indexing Server. File not present or client has unregistered.");
                     }
 
 
@@ -249,7 +254,7 @@ public class Peer {
             String[] fileLocations = messageFromServer.split("!");
             for(String oneRecord: fileLocations){
                 String[] fields = oneRecord.split("#");
-                System.out.println("Client ID: "+fields[0]+" Port: "+fields[1]+" Location: "+fields[2]+" File Name: "+fields[3]);
+                System.out.println("Client ID: "+fields[0].substring(4)+" Port: "+fields[1]+" Location: "+fields[2]+" File Name: "+fields[3]);
                // clientIdToPort.put(Integer.parseInt(fields[0]), Integer.parseInt(fields[1]));
                // portToLocation.put(Integer.parseInt(fields[1]), fields[2]);
             }

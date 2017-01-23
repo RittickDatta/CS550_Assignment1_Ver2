@@ -1,3 +1,5 @@
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -69,7 +71,10 @@ public class IndexingServer {
                 saveClientsServerPort(clientID, clientServersPort);
 
                 while (true) {
-                    messageFromClient = Integer.parseInt(inputStream.readLine());
+                    try{
+                        messageFromClient = Integer.parseInt(inputStream.readLine());
+                    }catch (NumberFormatException e){
+                    }
                     //System.out.println("Message from client: " + messageFromClient);
                     switch (messageFromClient) {
                         case 1:
@@ -100,15 +105,31 @@ public class IndexingServer {
 
                                 //SEARCH OPERATION HERE
                                 String searchResult = search(requestDataSearch);
+                                System.out.println("SEARCH RESULT: "+ searchResult);
                                 //outputStream.println("Client: "+nodeId+" has the file. Peer server is running at port:"+ getPort(clientID) +"Location:"+ getLocation(requestDataSearch));
-                                outputStream.println(searchResult);
-                                outputStream.flush();
+                                if(searchResult!= null) {
+                                    outputStream.println(searchResult);
+                                    outputStream.flush();
+                                }else
+                                {
+                                    outputStream.println("FILE NOT FOUND. CLIENT HAS UNREGISTERED.");
+                                    outputStream.flush();
+                                }
                                 break;
                             }
                             break;
 
                         case 3:
                             System.out.println("UNREGISTER FILES REQUEST");
+                            Boolean unregistered = unregister(clientID);
+
+                            if(unregistered){
+                                System.out.println("Files Successfully Unregistered.");
+                                for(Integer i: bigRegister.keySet()){
+                                    System.out.println("Serial Number: "+ i + "Value: "+bigRegister.get(i));
+                                }
+                            }
+
                             if(connection != null){
                                 connection.close();
                             }
@@ -116,6 +137,8 @@ public class IndexingServer {
                                 inputStream.close();
                             }
                             if(outputStream != null){
+                                outputStream.println("Your files are unregistered. Closing Connection.");
+                                outputStream.flush();
                                 outputStream.close();
                             }
                             break;
@@ -129,6 +152,23 @@ public class IndexingServer {
             }catch (IOException e){
 
             }
+        }
+
+        private Boolean unregister(int clientID) {
+            boolean unregistered = false;
+
+            for(Integer key: clientIdToSerialNumber.keySet()){
+                if(key.equals(clientID)){
+                    System.out.println(key);
+                    System.out.println(clientID);
+                    ArrayList<Integer> serialNumbersToRemove = clientIdToSerialNumber.get(clientID);
+                    for(int i=0; i<serialNumbersToRemove.size(); i++){
+                        bigRegister.remove(serialNumbersToRemove.get(i));
+                    }
+                    unregistered = true;
+                }
+            }
+            return unregistered;
         }
 
         private String getLocation(String fileName) {
@@ -201,7 +241,7 @@ public class IndexingServer {
                 }
             }*/
 
-            String bigString = "";
+            String bigString = null;
             for(Integer key: bigRegister.keySet()){
                 String currentRecord = bigRegister.get(key);
                 String[] recordPieces = currentRecord.split("#");
