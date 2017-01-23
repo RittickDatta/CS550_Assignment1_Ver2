@@ -108,7 +108,7 @@ public class Peer {
                 //messageToServer = selectOption();
                 writer.println(peerServerPort);
                 writer.flush();
-                while (messageToServer.compareTo("3") != 0) {
+                while (messageToServer.compareTo("q") != 0) {
                     messageToServer = selectOption();
                     writer.println(messageToServer);
                     writer.flush();
@@ -160,8 +160,8 @@ public class Peer {
                             System.out.println("Enter Port Number of Client to Download File:");
                             Integer portNumber = Integer.parseInt(userInput.readLine());
 
-                            System.out.println("Enter Location of Client to Download File:");
-                            String Location = userInput.readLine();
+                            //System.out.println("Enter Location of Client to Download File:");
+                            String Location = "Node"+clientNumber+"/Myfiles/";//userInput.readLine();
 
 
 
@@ -271,7 +271,7 @@ public class Peer {
                 System.out.println("Select an Operation (number, e.g. 1 or 2)");
                 System.out.println("1. Register Files");
                 System.out.println("2. Search File");
-                System.out.println("3. Quit");
+                System.out.println("3. Unregister Files");
                 option = userInput.readLine();
                 return option;
             }

@@ -20,7 +20,7 @@ public class IndexingServer {
     private static ConcurrentHashMap<String, String> fileNameToLocation = new ConcurrentHashMap<String, String>();
 
     private static ConcurrentHashMap<Integer, String> bigRegister = new ConcurrentHashMap<>();
-
+    private static ConcurrentHashMap<Integer, ArrayList<Integer>> clientIdToSerialNumber = new ConcurrentHashMap<>();
     private static int activeConnections = 0;
     private static int serialNumber = 1;
 
@@ -108,7 +108,7 @@ public class IndexingServer {
                             break;
 
                         case 3:
-                            System.out.println("QUIT REQUEST");
+                            System.out.println("UNREGISTER FILES REQUEST");
                             if(connection != null){
                                 connection.close();
                             }
@@ -161,6 +161,8 @@ public class IndexingServer {
             ArrayList<String> files = new ArrayList<String>();
             int port = getPort(clientID);
 
+            ArrayList<Integer> serialNumbersList = new ArrayList<>();
+
             String[] allRecords = fileData.split("!");
             for (String oneRecord : allRecords) {
                 String[] singleRecord = oneRecord.split("#");
@@ -170,15 +172,21 @@ public class IndexingServer {
                 // Client ID, Port, Location and Filename
                 String bigString = clientID+"#"+port+"#"+singleRecord[1]+"#"+singleRecord[0];
                 bigRegister.put(serialNumber, bigString);
+                serialNumbersList.add(serialNumber);
                 serialNumber += 1;
                 finalFlag = true;
             }
 
             clientIdToFilename.put(clientID, files);
 
+            clientIdToSerialNumber.put(clientID, serialNumbersList);
 
             for(Integer key:bigRegister.keySet()){
                 System.out.println("Serial Number : "+key+" Value: "+bigRegister.get(key));
+            }
+
+            for(Integer key:clientIdToSerialNumber.keySet()){
+                System.out.println("Client ID : "+key+" List of Serial Numbers: "+clientIdToSerialNumber.get(key));
             }
 
             return finalFlag;
