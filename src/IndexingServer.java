@@ -200,8 +200,9 @@ public class IndexingServer {
             boolean finalFlag = false;
             ArrayList<String> files = new ArrayList<String>();
             int port = getPort(clientID);
-
             ArrayList<Integer> serialNumbersList = new ArrayList<>();
+
+            checkRegister(clientID);
 
             String[] allRecords = fileData.split("!");
             for (String oneRecord : allRecords) {
@@ -211,6 +212,9 @@ public class IndexingServer {
 
                 // Client ID, Port, Location and Filename
                 String bigString = clientID+"#"+port+"#"+singleRecord[1]+"#"+singleRecord[0];
+
+
+
                 bigRegister.put(serialNumber, bigString);
                 serialNumbersList.add(serialNumber);
                 serialNumber += 1;
@@ -230,6 +234,25 @@ public class IndexingServer {
             }
 
             return finalFlag;
+        }
+
+        private void checkRegister(int clientID) {
+
+            for(Integer key: bigRegister.keySet()){
+                String record = bigRegister.get(key);
+                String[] fields = new String[0];
+                try {
+                    fields = record.split("#");
+                } catch (NullPointerException e) {
+                }
+                if(Integer.parseInt(fields[0])==clientID){
+                    ArrayList<Integer> serialNumbers = clientIdToSerialNumber.get(clientID);
+                    for(int i=0; i<serialNumbers.size(); i++){
+                        bigRegister.remove(serialNumbers.get(i));
+                    }
+                }
+            }
+
         }
 
         public String search(String fileName) {
