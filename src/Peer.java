@@ -19,6 +19,8 @@ public class Peer {
     private static String FILE_DOWNLOAD_LOCATION;
     private static HashMap<Integer, Integer> clientIdToPort = new HashMap<>();
     private static HashMap<Integer, String> portToLocation = new HashMap<>();
+    private static String filesOfThisNode = null;
+    private static Boolean registeredOnce = false;
 
     public Peer() {
 
@@ -85,7 +87,7 @@ public class Peer {
         int peerServerPort;
         InputStream input;
         ByteArrayOutputStream byteOutputStream;
-
+        String fileData;
 
         public PeerClient(InetAddress serverAddress, int serverPort, String peerFileLocation, int peerServerPort) {
             this.serverAddress = serverAddress;
@@ -109,6 +111,31 @@ public class Peer {
                 writer.println(peerServerPort);
                 writer.flush();
                 while (messageToServer.compareTo("q") != 0) {
+
+                    if(registeredOnce){
+                        String fileDataCheck = getFileData(peerFileLocation);
+                        if(fileDataCheck.compareTo(fileData)==0){
+                            System.out.println("No File is Modified. Update to Indexing Server is Not Required.");
+                        }else{
+                            /*messageToServer = "3";
+                            writer.println(messageToServer);
+                            writer.flush();
+                            serverResponse = socketInput.readLine();*/
+
+                            messageToServer = "1";
+                            writer.println(messageToServer);
+                            writer.flush();
+                            serverResponse = socketInput.readLine();
+                            fileData = getFileData(peerFileLocation);
+                            writer.println(fileData);
+                            writer.flush();
+                            serverResponse = socketInput.readLine();
+                            System.out.println(serverResponse);
+                            System.out.println("Server's message:" + "FILES UPDATED AT INDEXING SERVER.");
+
+                        }
+                    }
+
                     messageToServer = selectOption();
                     writer.println(messageToServer);
                     writer.flush();
@@ -121,10 +148,14 @@ public class Peer {
 
                     switch (serverResponse) {
                         case "SEND FILE DATA":
+                            registeredOnce = true;
                             System.out.println("Preparing File Data.");
 
-                            String fileData = getFileData(peerFileLocation);
 
+                            fileData = getFileData(peerFileLocation);
+
+                            filesOfThisNode = fileData;
+                            System.out.println("Files of this node: "+filesOfThisNode);
 
                             //messageToServer = fileData;  call method for file data
                             writer.println(fileData);
@@ -251,10 +282,19 @@ public class Peer {
 
 
         private void handleServerResult(String messageFromServer) {
+
+            ArrayList<String> processedRecords = new ArrayList<>();
+
             String[] fileLocations = messageFromServer.split("!");
             for(String oneRecord: fileLocations){
+                if(processedRecords.contains(oneRecord))continue;
+                processedRecords.add(oneRecord);
+
                 String[] fields = oneRecord.split("#");
-                System.out.println("Client ID: "+fields[0].substring(4)+" Port: "+fields[1]+" Location: "+fields[2]+" File Name: "+fields[3]);
+                try {
+                System.out.println("Client ID: "+fields[1]/*.substring(4,5)*/+" Port: "+fields[2]+" Location: "+fields[3]+" File Name: "+fields[4]);
+
+                }catch (ArrayIndexOutOfBoundsException e){}
                // clientIdToPort.put(Integer.parseInt(fields[0]), Integer.parseInt(fields[1]));
                // portToLocation.put(Integer.parseInt(fields[1]), fields[2]);
             }

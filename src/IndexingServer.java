@@ -171,14 +171,14 @@ public class IndexingServer {
             return unregistered;
         }
 
-        private String getLocation(String fileName) {
+       /* private String getLocation(String fileName) {
             for(String name: fileNameToLocation.keySet()){
                 if(name.equals(fileName)){
                     return fileNameToLocation.get(name);
                 }
             }
             return "";
-        }
+        }*/
 
         private void saveClientsServerPort(int clientID, int clientServersPort) {
             clientIdToPeerServer.put(clientID, clientServersPort);
@@ -241,7 +241,7 @@ public class IndexingServer {
                 }
             }*/
 
-            String bigString = null;
+            String bigString = null+"#";
             for(Integer key: bigRegister.keySet()){
                 String currentRecord = bigRegister.get(key);
                 String[] recordPieces = currentRecord.split("#");
