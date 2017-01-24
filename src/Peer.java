@@ -1,13 +1,9 @@
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 
-import javax.xml.bind.SchemaOutputResolver;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.Buffer;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by rittick on 1/17/17.
@@ -42,19 +38,22 @@ public class Peer {
             int clientID = 1;
             ServerSocket peerServer = new ServerSocket(PEER_SERVER_PORT);
             System.out.println("Peer Server is Listening...");
+            System.out.println();
 
             // -----------------PEER CLIENT SECTION---------------
 
             InetAddress serverAddress = InetAddress.getLocalHost();
             System.out.println("Enter Node Number for Peer: (e.g. Node1, Node2 etc.)");
             PEER_CLIENT_FILE_LOCATION = userInput.readLine();
+            System.out.println();
             PEER_CLIENT_FILE_LOCATION += "/Myfiles/";
-//            System.out.println("Enter Download Location for Peer:");
+            // System.out.println("Enter Download Location for Peer:");
             FILE_DOWNLOAD_LOCATION = PEER_CLIENT_FILE_LOCATION.substring(0, 6) + "Downloads/";
-            System.out.println(FILE_DOWNLOAD_LOCATION);
+           // System.out.println(FILE_DOWNLOAD_LOCATION);
             FILE_LOCATION = PEER_CLIENT_FILE_LOCATION.substring(0, 5) + FILE_LOCATION;
-            System.out.println(FILE_LOCATION);
+           // System.out.println(FILE_LOCATION);
             System.out.println("Peer Client is Running...");
+            System.out.println();
             new PeerClient(serverAddress, 3000, PEER_CLIENT_FILE_LOCATION, PEER_SERVER_PORT).start();
 
             //-----------------------------------------------------
@@ -140,11 +139,15 @@ public class Peer {
                     writer.println(messageToServer);
                     writer.flush();
                     serverResponse = socketInput.readLine();
-                    System.out.println("Server's message:" + serverResponse);
+
 
                     if (serverResponse == null) {
+                        serverResponse = "Closing Connection...";
+                        System.out.println("Server's message:" + serverResponse);
                         break;
                     }
+                    System.out.println("Server's message:" + serverResponse);
+
 
                     switch (serverResponse) {
                         case "SEND FILE DATA":
@@ -155,7 +158,7 @@ public class Peer {
                             fileData = getFileData(peerFileLocation);
 
                             filesOfThisNode = fileData;
-                            System.out.println("Files of this node: "+filesOfThisNode);
+                            //System.out.println("Files of this node: "+filesOfThisNode);
 
                             //messageToServer = fileData;  call method for file data
                             writer.println(fileData);
@@ -181,7 +184,7 @@ public class Peer {
                             writer.println(messageToServer);
                             writer.flush();
                             messageFromServer = socketInput.readLine();
-                            System.out.println(messageFromServer);
+                            //System.out.println(messageFromServer);
 
                             if(messageFromServer.compareTo("FILE NOT FOUND. CLIENT HAS UNREGISTERED.")==0) {
                                 break;
@@ -285,10 +288,14 @@ public class Peer {
 
             ArrayList<String> processedRecords = new ArrayList<>();
 
+            System.out.println("----------------------------------------------------------");
+            System.out.println("The Following Clients have the File:");
+
             String[] fileLocations = messageFromServer.split("!");
             for(String oneRecord: fileLocations){
-                if(processedRecords.contains(oneRecord))continue;
-                processedRecords.add(oneRecord);
+                //System.out.println(oneRecord);
+                /*if(processedRecords.contains(oneRecord))continue;
+                processedRecords.add(oneRecord);*/
 
                 String[] fields = oneRecord.split("#");
                 try {
@@ -313,6 +320,7 @@ public class Peer {
             String option;
             BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
             while (true) {
+                System.out.println("-----------------------------------------------------------------");
                 System.out.println("Select an Operation (number, e.g. 1 or 2)");
                 System.out.println("1. Register Files");
                 System.out.println("2. Search File");
@@ -350,6 +358,7 @@ public class Peer {
                 String fullFileAddress = inputStream.readLine();
 
 //                System.out.println(fullFileAddress);
+                System.out.println("-------------SERVER LOG FOR CLIENT REQUEST------------------");
                 System.out.println("Full file address :" + fullFileAddress);
                 System.out.println(" PEER SERVER, CLIENT ID: " + clientId);
 
@@ -360,6 +369,12 @@ public class Peer {
 
 
                 System.out.println("File Successfully Sent.");
+                System.out.println("-------------END OF REQUEST LOG------------------------------");
+                System.out.println("Select an Operation (number, e.g. 1 or 2)");
+                System.out.println("1. Register Files");
+                System.out.println("2. Search File");
+                System.out.println("3. Unregister Files");
+                System.out.println();
 
 
             } catch (IOException e) {
@@ -409,7 +424,7 @@ public class Peer {
 
                     try {
                         InputStream.read(byteArray, 0, byteArray.length);
-                        System.out.println("Bytes Read : "+byteArray);
+                        //System.out.println("Bytes Read : "+byteArray);
                         output.write(byteArray, 0, byteArray.length);
                         output.flush();
                     } catch (IOException e) {

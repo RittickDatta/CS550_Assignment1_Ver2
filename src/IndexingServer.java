@@ -1,4 +1,3 @@
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -105,7 +104,7 @@ public class IndexingServer {
 
                                 //SEARCH OPERATION HERE
                                 String searchResult = search(requestDataSearch);
-                                System.out.println("SEARCH RESULT: "+ searchResult);
+                                //System.out.println("SEARCH RESULT: "+ searchResult);
                                 //outputStream.println("Client: "+nodeId+" has the file. Peer server is running at port:"+ getPort(clientID) +"Location:"+ getLocation(requestDataSearch));
                                 if(searchResult!= null) {
                                     outputStream.println(searchResult);
@@ -159,8 +158,8 @@ public class IndexingServer {
 
             for(Integer key: clientIdToSerialNumber.keySet()){
                 if(key.equals(clientID)){
-                    System.out.println(key);
-                    System.out.println(clientID);
+                    //System.out.println(key);
+                    //System.out.println(clientID);
                     ArrayList<Integer> serialNumbersToRemove = clientIdToSerialNumber.get(clientID);
                     for(int i=0; i<serialNumbersToRemove.size(); i++){
                         bigRegister.remove(serialNumbersToRemove.get(i));
@@ -269,7 +268,7 @@ public class IndexingServer {
                 String currentRecord = bigRegister.get(key);
                 String[] recordPieces = currentRecord.split("#");
                 if(fileName.equals(recordPieces[recordPieces.length-1])){
-                    bigString += currentRecord + "!";
+                    bigString += currentRecord + "!"+null+"#";
                 }
             }
 
