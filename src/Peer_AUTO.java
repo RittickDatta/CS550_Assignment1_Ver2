@@ -109,7 +109,9 @@ public class Peer_AUTO {
                 //messageToServer = selectOption();
                 writer.println(peerServerPort);
                 writer.flush();
-                while (messageToServer.compareTo("q") != 0) {
+                //while (messageToServer.compareTo("q") != 0)
+                for(int i=0; i<2; i++)
+                {
 
                     if(registeredOnce){
                         String fileDataCheck = getFileData(peerFileLocation);

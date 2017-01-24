@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,9 +8,10 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by rittick on 1/17/17.
+ * Created by rittick on 1/24/17.
  */
-public class IndexingServer {
+public class IndexingServer_Auto {
+
 
     private static final int SERVER_PORT = 3000;
     private static ConcurrentHashMap<Integer, ArrayList<String>> clientIdToFilename = new ConcurrentHashMap<Integer, ArrayList<String>>();
@@ -34,13 +34,13 @@ public class IndexingServer {
 
         while (true) {
             Socket newConnection = server.accept();
-            new ServerThread(clientID, newConnection).start();
+            new ServerThread_AUTO(clientID, newConnection).start();
             System.out.println("New Connection Accepted. Client ID: " + clientID);
             clientID = clientID + 1;
         }
     }
 
-    private static class ServerThread extends Thread {
+    private static class ServerThread_AUTO extends Thread {
         private int clientID;
         private Socket connection;
         private int messageFromClient;
@@ -50,7 +50,7 @@ public class IndexingServer {
 
         private int clientServerPort;
 
-        public ServerThread(int clientID, Socket connection) {
+        public ServerThread_AUTO(int clientID, Socket connection) {
             this.clientID = clientID;
             this.connection = connection;
         }
@@ -69,7 +69,9 @@ public class IndexingServer {
                 System.out.println("Client's Server Port : "+ clientServersPort);
                 saveClientsServerPort(clientID, clientServersPort);
 
-                while (true) {
+                //while (true)
+                for(int j=0; j<2;j++)
+                {
                     try{
                         messageFromClient = Integer.parseInt(inputStream.readLine());
                     }catch (NumberFormatException e){
