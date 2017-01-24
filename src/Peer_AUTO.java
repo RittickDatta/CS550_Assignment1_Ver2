@@ -32,8 +32,8 @@ public class Peer_AUTO {
 
             System.out.println("Peer Server Preparing to Start...");
             System.out.println("Enter Port Number for Peer Server:");
-            BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
-            PEER_SERVER_PORT = Integer.parseInt(userInput.readLine());
+            //BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
+            PEER_SERVER_PORT = 4000;//Integer.parseInt(userInput.readLine());
 
             int clientID = 1;
             ServerSocket peerServer = new ServerSocket(PEER_SERVER_PORT);
@@ -44,7 +44,7 @@ public class Peer_AUTO {
 
             InetAddress serverAddress = InetAddress.getLocalHost();
             System.out.println("Enter Node Number for Peer: (e.g. Node1, Node2 etc.)");
-            PEER_CLIENT_FILE_LOCATION = userInput.readLine();
+            PEER_CLIENT_FILE_LOCATION = "Node1";//userInput.readLine();
             System.out.println();
             PEER_CLIENT_FILE_LOCATION += "/Myfiles/";
             // System.out.println("Enter Download Location for Peer:");
@@ -135,7 +135,7 @@ public class Peer_AUTO {
                         }
                     }
 
-                    messageToServer = selectOption();
+                    messageToServer = "1";//selectOption();
                     writer.println(messageToServer);
                     writer.flush();
                     serverResponse = socketInput.readLine();
