@@ -152,7 +152,7 @@ public class Peer_AUTO {
 
                     switch (serverResponse) {
                         case "SEND FILE DATA":
-                            for (int i=0; i<3; i++) {
+                            for (int i=0; i<1000; i++) {
                                 registeredOnce = true;
                                 System.out.println("Preparing File Data.");
 
@@ -172,12 +172,13 @@ public class Peer_AUTO {
                                 serverResponse = socketInput.readLine();
                                 System.out.println(serverResponse);
                             }
-                            break;
+                            //break;
 
                         case "NAME OF FILE TO SEARCH":
+                            for(int i=0; i<1000;i++){
                             messageToServer = "";
                             System.out.println("Enter Name of File to Search:");
-                            messageToServer = userInput.readLine();
+                            messageToServer = "file1.txt";//userInput.readLine();
 
                             String FILE_DOWNLOAD_LOCATION_copy = FILE_DOWNLOAD_LOCATION;
                             FILE_DOWNLOAD_LOCATION_copy += messageToServer;
@@ -195,10 +196,10 @@ public class Peer_AUTO {
                             handleServerResult(messageFromServer);
 
                             System.out.println("Enter Client Number to Download File:");
-                            Integer clientNumber = Integer.parseInt(userInput.readLine());
+                            Integer clientNumber = Integer.parseInt("1");//Integer.parseInt(userInput.readLine());
 
                             System.out.println("Enter Port Number of Client to Download File:");
-                            Integer portNumber = Integer.parseInt(userInput.readLine());
+                            Integer portNumber = Integer.parseInt("4000");//Integer.parseInt(userInput.readLine());
 
                             //System.out.println("Enter Location of Client to Download File:");
                             String Location = "Node"+clientNumber+"/Myfiles/";//userInput.readLine();
@@ -210,7 +211,7 @@ public class Peer_AUTO {
                             PrintWriter writerDownload = null;
 
                             System.out.println("Do you want to download file? (y/n) File will be saved in 'Downloads' directory.");
-                            String download = userInput.readLine();
+                            String download = "y";//userInput.readLine();
                             if (download.compareToIgnoreCase("y") == 0) {
 
                                 System.out.println("Contacting Peer To Download File...");
@@ -251,6 +252,9 @@ public class Peer_AUTO {
                                 }
 
                             }
+
+                            }
+
                             break;
                         case "FILE NOT FOUND. CLIENT HAS UNREGISTERED.":
                             System.out.println("File Not Found at Indexing Server. File not present or client has unregistered.");

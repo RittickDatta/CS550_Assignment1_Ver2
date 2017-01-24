@@ -81,7 +81,7 @@ public class IndexingServer_Auto {
                         case 1:
 
 
-                            for (int i=0; i<3; i++) {
+                            for (int i=0; i<1000; i++) {
                                 System.out.println("FILE REGISTRATION REQUEST");
                                 outputStream.println("SEND FILE DATA");
                                 outputStream.flush();
@@ -99,30 +99,31 @@ public class IndexingServer_Auto {
                             }
 
 
-                            break;
+                            //break;
 
                         case 2:
-                            System.out.println("FILE SEARCH REQUEST");
-                            outputStream.println("NAME OF FILE TO SEARCH");
-                            outputStream.flush();
+                            for (int j=0; j<1000; j++) {
+                                System.out.println("FILE SEARCH REQUEST");
+                                outputStream.println("NAME OF FILE TO SEARCH");
+                                outputStream.flush();
 
-                            String requestDataSearch = inputStream.readLine();
-                            while(requestDataSearch.compareToIgnoreCase("cancel")!=0) {
-                                System.out.println(requestDataSearch);
+                                String requestDataSearch = inputStream.readLine();
+                                while (requestDataSearch.compareToIgnoreCase("cancel") != 0) {
+                                    System.out.println(requestDataSearch);
 
-                                //SEARCH OPERATION HERE
-                                String searchResult = search(requestDataSearch);
-                                //System.out.println("SEARCH RESULT: "+ searchResult);
-                                //outputStream.println("Client: "+nodeId+" has the file. Peer server is running at port:"+ getPort(clientID) +"Location:"+ getLocation(requestDataSearch));
-                                if(searchResult!= null) {
-                                    outputStream.println(searchResult);
-                                    outputStream.flush();
-                                }else
-                                {
-                                    outputStream.println("FILE NOT FOUND. CLIENT HAS UNREGISTERED.");
-                                    outputStream.flush();
+                                    //SEARCH OPERATION HERE
+                                    String searchResult = search(requestDataSearch);
+                                    //System.out.println("SEARCH RESULT: "+ searchResult);
+                                    //outputStream.println("Client: "+nodeId+" has the file. Peer server is running at port:"+ getPort(clientID) +"Location:"+ getLocation(requestDataSearch));
+                                    if (searchResult != null) {
+                                        outputStream.println(searchResult);
+                                        outputStream.flush();
+                                    } else {
+                                        outputStream.println("FILE NOT FOUND. CLIENT HAS UNREGISTERED.");
+                                        outputStream.flush();
+                                    }
+                                    break;
                                 }
-                                break;
                             }
                             break;
 
