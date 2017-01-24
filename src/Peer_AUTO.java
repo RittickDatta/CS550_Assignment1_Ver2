@@ -17,7 +17,6 @@ public class Peer_AUTO {
     private static String filesOfThisNode = null;
     private static Boolean registeredOnce = false;
 
-
     public Peer_AUTO() {
 
     }
@@ -32,8 +31,8 @@ public class Peer_AUTO {
 
             System.out.println("Peer Server Preparing to Start...");
             System.out.println("Enter Port Number for Peer Server:");
-            //BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
-            PEER_SERVER_PORT = 4000;//Integer.parseInt(userInput.readLine());
+            BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
+            PEER_SERVER_PORT = Integer.parseInt("4000");//Integer.parseInt(userInput.readLine());
 
             int clientID = 1;
             ServerSocket peerServer = new ServerSocket(PEER_SERVER_PORT);
@@ -54,13 +53,13 @@ public class Peer_AUTO {
             // System.out.println(FILE_LOCATION);
             System.out.println("Peer Client is Running...");
             System.out.println();
-            new Peer_AUTO.PeerClient_AUTO(serverAddress, 3000, PEER_CLIENT_FILE_LOCATION, PEER_SERVER_PORT).start();
+            new PeerClient(serverAddress, 3000, PEER_CLIENT_FILE_LOCATION, PEER_SERVER_PORT).start();
 
             //-----------------------------------------------------
 
             while (true) {
                 Socket newConnection = peerServer.accept();
-                new Peer_AUTO.PeerServer_AUTO(clientID, newConnection).start();
+                new PeerServer(clientID, newConnection).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -70,7 +69,7 @@ public class Peer_AUTO {
 
     }
 
-    private static class PeerClient_AUTO extends Thread {
+    private static class PeerClient extends Thread {
         InetAddress serverAddress;
         int serverPort;
         Socket socket = null;
@@ -88,7 +87,7 @@ public class Peer_AUTO {
         ByteArrayOutputStream byteOutputStream;
         String fileData;
 
-        public PeerClient_AUTO(InetAddress serverAddress, int serverPort, String peerFileLocation, int peerServerPort) {
+        public PeerClient(InetAddress serverAddress, int serverPort, String peerFileLocation, int peerServerPort) {
             this.serverAddress = serverAddress;
             this.serverPort = serverPort;
             this.peerFileLocation = peerFileLocation;
@@ -110,7 +109,7 @@ public class Peer_AUTO {
                 writer.println(peerServerPort);
                 writer.flush();
                 //while (messageToServer.compareTo("q") != 0)
-                for(int i=0; i<2; i++)
+                for(int j=0; j<1; j++)
                 {
 
                     if(registeredOnce){
@@ -153,24 +152,26 @@ public class Peer_AUTO {
 
                     switch (serverResponse) {
                         case "SEND FILE DATA":
-                            registeredOnce = true;
-                            System.out.println("Preparing File Data.");
+                            for (int i=0; i<3; i++) {
+                                registeredOnce = true;
+                                System.out.println("Preparing File Data.");
 
 
-                            fileData = getFileData(peerFileLocation);
+                                fileData = getFileData(peerFileLocation);
 
-                            filesOfThisNode = fileData;
-                            //System.out.println("Files of this node: "+filesOfThisNode);
+                                filesOfThisNode = fileData;
+                                //System.out.println("Files of this node: "+filesOfThisNode);
 
-                            //messageToServer = fileData;  call method for file data
-                            writer.println(fileData);
-                            writer.flush();
+                                //messageToServer = fileData;  call method for file data
+                                writer.println(fileData);
+                                writer.flush();
 
 
-                            System.out.println("File Data Sent.");
+                                System.out.println("File Data Sent.");
 
-                            serverResponse = socketInput.readLine();
-                            System.out.println(serverResponse);
+                                serverResponse = socketInput.readLine();
+                                System.out.println(serverResponse);
+                            }
                             break;
 
                         case "NAME OF FILE TO SEARCH":
@@ -336,7 +337,7 @@ public class Peer_AUTO {
 
     }
 
-    private static class PeerServer_AUTO extends Thread {
+    private static class PeerServer extends Thread {
         private ArrayList<String> fileNamesRegister = new ArrayList<String>();
 
         private int clientId;
@@ -346,7 +347,7 @@ public class Peer_AUTO {
         private BufferedOutputStream output;
         private BufferedInputStream fileInputStream;
 
-        public PeerServer_AUTO(int clientId, Socket connection) {
+        public PeerServer(int clientId, Socket connection) {
             this.clientId = clientId;
             this.connection = connection;
 

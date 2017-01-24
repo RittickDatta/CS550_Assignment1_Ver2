@@ -34,13 +34,13 @@ public class IndexingServer_Auto {
 
         while (true) {
             Socket newConnection = server.accept();
-            new ServerThread_AUTO(clientID, newConnection).start();
+            new ServerThread(clientID, newConnection).start();
             System.out.println("New Connection Accepted. Client ID: " + clientID);
             clientID = clientID + 1;
         }
     }
 
-    private static class ServerThread_AUTO extends Thread {
+    private static class ServerThread extends Thread {
         private int clientID;
         private Socket connection;
         private int messageFromClient;
@@ -50,7 +50,7 @@ public class IndexingServer_Auto {
 
         private int clientServerPort;
 
-        public ServerThread_AUTO(int clientID, Socket connection) {
+        public ServerThread(int clientID, Socket connection) {
             this.clientID = clientID;
             this.connection = connection;
         }
@@ -70,7 +70,7 @@ public class IndexingServer_Auto {
                 saveClientsServerPort(clientID, clientServersPort);
 
                 //while (true)
-                for(int j=0; j<2;j++)
+                for (int k=0; k<1; k++)
                 {
                     try{
                         messageFromClient = Integer.parseInt(inputStream.readLine());
@@ -79,20 +79,26 @@ public class IndexingServer_Auto {
                     //System.out.println("Message from client: " + messageFromClient);
                     switch (messageFromClient) {
                         case 1:
-                            System.out.println("FILE REGISTRATION REQUEST");
-                            outputStream.println("SEND FILE DATA");
-                            outputStream.flush();
-                            String requestData = inputStream.readLine();
 
-                            boolean flag = registry(clientID, requestData);
 
-                            // while (requestData.compareToIgnoreCase("QUIT") != 0) {
-                            if(flag) {
-                                outputStream.println("FILES REGISTERED");
+                            for (int i=0; i<3; i++) {
+                                System.out.println("FILE REGISTRATION REQUEST");
+                                outputStream.println("SEND FILE DATA");
                                 outputStream.flush();
+                                String requestData = inputStream.readLine();
+
+                                boolean flag = registry(clientID, requestData);
+
+                                // while (requestData.compareToIgnoreCase("QUIT") != 0) {
+                                if(flag) {
+                                    outputStream.println("FILES REGISTERED");
+                                    outputStream.flush();
+                                }
+                                //requestData = inputStream.readLine();
+                                //}
                             }
-                            //requestData = inputStream.readLine();
-                            //}
+
+
                             break;
 
                         case 2:
