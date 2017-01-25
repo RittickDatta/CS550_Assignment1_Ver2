@@ -5,9 +5,10 @@ import java.net.Socket;
 import java.util.*;
 
 /**
- * Created by rittick on 1/24/17.
+ * Created by rittick on 1/25/17.
  */
-public class Peer_AUTO {
+public class Peer_Auto_Concurrent {
+
     private static int PEER_SERVER_PORT;
     private static String PEER_CLIENT_FILE_LOCATION;
     private static String FILE_LOCATION = "/Myfiles/";
@@ -17,7 +18,7 @@ public class Peer_AUTO {
     private static String filesOfThisNode = null;
     private static Boolean registeredOnce = false;
 
-    public Peer_AUTO() {
+    public Peer_Auto_Concurrent() {
 
     }
 
@@ -32,7 +33,7 @@ public class Peer_AUTO {
             System.out.println("Peer Server Preparing to Start...");
             System.out.println("Enter Port Number for Peer Server:");
             BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
-            PEER_SERVER_PORT = Integer.parseInt("4000");//Integer.parseInt(userInput.readLine());
+            PEER_SERVER_PORT = Integer.parseInt(userInput.readLine());
 
             int clientID = 1;
             ServerSocket peerServer = new ServerSocket(PEER_SERVER_PORT);
@@ -43,7 +44,7 @@ public class Peer_AUTO {
 
             InetAddress serverAddress = InetAddress.getLocalHost();
             System.out.println("Enter Node Number for Peer: (e.g. Node1, Node2 etc.)");
-            PEER_CLIENT_FILE_LOCATION = "Node1";//userInput.readLine();
+            PEER_CLIENT_FILE_LOCATION = userInput.readLine();
             System.out.println();
             PEER_CLIENT_FILE_LOCATION += "/Myfiles/";
             // System.out.println("Enter Download Location for Peer:");
@@ -53,13 +54,13 @@ public class Peer_AUTO {
             // System.out.println(FILE_LOCATION);
             System.out.println("Peer Client is Running...");
             System.out.println();
-            new PeerClient(serverAddress, 3000, PEER_CLIENT_FILE_LOCATION, PEER_SERVER_PORT).start();
+            new PeerClient_Auto_Concurrent(serverAddress, 3000, PEER_CLIENT_FILE_LOCATION, PEER_SERVER_PORT).start();
 
             //-----------------------------------------------------
 
             while (true) {
                 Socket newConnection = peerServer.accept();
-                new PeerServer(clientID, newConnection).start();
+                new PeerServer_Auto_Concurrent(clientID, newConnection).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -69,7 +70,7 @@ public class Peer_AUTO {
 
     }
 
-    private static class PeerClient extends Thread {
+    private static class PeerClient_Auto_Concurrent extends Thread {
         InetAddress serverAddress;
         int serverPort;
         Socket socket = null;
@@ -103,7 +104,7 @@ public class Peer_AUTO {
         ArrayList<Long> timeTakenSearchList = new ArrayList<>();
         ArrayList<Long> timeTakenObtainList = new ArrayList<>();
 
-        public PeerClient(InetAddress serverAddress, int serverPort, String peerFileLocation, int peerServerPort) {
+        public PeerClient_Auto_Concurrent(InetAddress serverAddress, int serverPort, String peerFileLocation, int peerServerPort) {
             this.serverAddress = serverAddress;
             this.serverPort = serverPort;
             this.peerFileLocation = peerFileLocation;
@@ -151,7 +152,7 @@ public class Peer_AUTO {
                         }
                     }
 
-                    messageToServer = "1";//selectOption();
+                    messageToServer = selectOption();
                     writer.println(messageToServer);
                     writer.flush();
                     serverResponse = socketInput.readLine();
@@ -196,7 +197,7 @@ public class Peer_AUTO {
                                 timeTakenRegisterList.add(timeTakenRegister);
                                 //-----------------------------------------------------
                             }
-                            //break;
+                            break;
 
                         case "NAME OF FILE TO SEARCH":
                             for (int i = 0; i < 1000; i++) {
@@ -206,7 +207,7 @@ public class Peer_AUTO {
 
                                 messageToServer = "";
                                 System.out.println("Enter Name of File to Search:");
-                                messageToServer = "file10.txt";//userInput.readLine();
+                                messageToServer = "file1.txt";//userInput.readLine();
 
                                 String FILE_DOWNLOAD_LOCATION_copy = FILE_DOWNLOAD_LOCATION;
                                 FILE_DOWNLOAD_LOCATION_copy += messageToServer;
@@ -404,7 +405,7 @@ public class Peer_AUTO {
 
     }
 
-    private static class PeerServer extends Thread {
+    private static class PeerServer_Auto_Concurrent extends Thread {
         private ArrayList<String> fileNamesRegister = new ArrayList<String>();
 
         private int clientId;
@@ -414,7 +415,7 @@ public class Peer_AUTO {
         private BufferedOutputStream output;
         private BufferedInputStream fileInputStream;
 
-        public PeerServer(int clientId, Socket connection) {
+        public PeerServer_Auto_Concurrent(int clientId, Socket connection) {
             this.clientId = clientId;
             this.connection = connection;
 
