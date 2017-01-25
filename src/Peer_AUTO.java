@@ -1,3 +1,4 @@
+import javax.sound.midi.SysexMessage;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -87,6 +88,22 @@ public class Peer_AUTO {
         ByteArrayOutputStream byteOutputStream;
         String fileData;
 
+        Long startTimeRegister;
+        Long endTimeRegister;
+        Long timeTakenRegister;
+
+        Long startTimeSearch;
+        Long endTimeSearch;
+        Long timeTakenSearch;
+
+        Long startTimeObtain;
+        Long endTimeObtain;
+        Long timeTakenObtain;
+
+        ArrayList<Long> timeTakenRegisterList = new ArrayList<>();
+        ArrayList<Long> timeTakenSearchList = new ArrayList<>();
+        ArrayList<Long> timeTakenObtainList = new ArrayList<>();
+
         public PeerClient(InetAddress serverAddress, int serverPort, String peerFileLocation, int peerServerPort) {
             this.serverAddress = serverAddress;
             this.serverPort = serverPort;
@@ -109,14 +126,13 @@ public class Peer_AUTO {
                 writer.println(peerServerPort);
                 writer.flush();
                 //while (messageToServer.compareTo("q") != 0)
-                for(int j=0; j<1; j++)
-                {
+                for (int j = 0; j < 1; j++) {
 
-                    if(registeredOnce){
+                    if (registeredOnce) {
                         String fileDataCheck = getFileData(peerFileLocation);
-                        if(fileDataCheck.compareTo(fileData)==0){
+                        if (fileDataCheck.compareTo(fileData) == 0) {
                             System.out.println("No File is Modified. Update to Indexing Server is Not Required.");
-                        }else{
+                        } else {
                             /*messageToServer = "3";
                             writer.println(messageToServer);
                             writer.flush();
@@ -152,7 +168,11 @@ public class Peer_AUTO {
 
                     switch (serverResponse) {
                         case "SEND FILE DATA":
-                            for (int i=0; i<1000; i++) {
+                            for (int i = 0; i < 1000; i++) {
+
+                                //---------------------------------------------------
+                                startTimeRegister = System.currentTimeMillis();
+
                                 registeredOnce = true;
                                 System.out.println("Preparing File Data.");
 
@@ -171,87 +191,106 @@ public class Peer_AUTO {
 
                                 serverResponse = socketInput.readLine();
                                 System.out.println(serverResponse);
+
+                                endTimeRegister = System.currentTimeMillis();
+                                timeTakenRegister = endTimeRegister - startTimeRegister;
+                                timeTakenRegisterList.add(timeTakenRegister);
+                                //-----------------------------------------------------
                             }
                             //break;
 
                         case "NAME OF FILE TO SEARCH":
-                            for(int i=0; i<1000;i++){
-                            messageToServer = "";
-                            System.out.println("Enter Name of File to Search:");
-                            messageToServer = "file1.txt";//userInput.readLine();
+                            for (int i = 0; i < 1000; i++) {
 
-                            String FILE_DOWNLOAD_LOCATION_copy = FILE_DOWNLOAD_LOCATION;
-                            FILE_DOWNLOAD_LOCATION_copy += messageToServer;
+                                //---------------------------------------------------
+                                startTimeSearch = System.currentTimeMillis();
 
-                            String fileToDownload = messageToServer;
+                                messageToServer = "";
+                                System.out.println("Enter Name of File to Search:");
+                                messageToServer = "file1.txt";//userInput.readLine();
 
-                            writer.println(messageToServer);
-                            writer.flush();
-                            messageFromServer = socketInput.readLine();
-                            //System.out.println(messageFromServer);
+                                String FILE_DOWNLOAD_LOCATION_copy = FILE_DOWNLOAD_LOCATION;
+                                FILE_DOWNLOAD_LOCATION_copy += messageToServer;
 
-                            if(messageFromServer.compareTo("FILE NOT FOUND. CLIENT HAS UNREGISTERED.")==0) {
-                                break;
-                            }
-                            handleServerResult(messageFromServer);
+                                String fileToDownload = messageToServer;
 
-                            System.out.println("Enter Client Number to Download File:");
-                            Integer clientNumber = Integer.parseInt("1");//Integer.parseInt(userInput.readLine());
+                                writer.println(messageToServer);
+                                writer.flush();
+                                messageFromServer = socketInput.readLine();
+                                //System.out.println(messageFromServer);
 
-                            System.out.println("Enter Port Number of Client to Download File:");
-                            Integer portNumber = Integer.parseInt("4000");//Integer.parseInt(userInput.readLine());
+                                if (messageFromServer.compareTo("FILE NOT FOUND. CLIENT HAS UNREGISTERED.") == 0) {
+                                    break;
+                                }
+                                handleServerResult(messageFromServer);
 
-                            //System.out.println("Enter Location of Client to Download File:");
-                            String Location = "Node"+clientNumber+"/Myfiles/";//userInput.readLine();
+                                System.out.println("Enter Client Number to Download File:");
+                                Integer clientNumber = Integer.parseInt("1");//Integer.parseInt(userInput.readLine());
+
+                                System.out.println("Enter Port Number of Client to Download File:");
+                                Integer portNumber = Integer.parseInt("4000");//Integer.parseInt(userInput.readLine());
+
+                                //System.out.println("Enter Location of Client to Download File:");
+                                String Location = "Node" + clientNumber + "/Myfiles/";//userInput.readLine();
 
 
+                                endTimeSearch = System.currentTimeMillis();
+                                timeTakenSearch = endTimeSearch - startTimeSearch;
+                                timeTakenSearchList.add(timeTakenSearch);
+                                //------------------------------------------------
 
-                            //-------DOWNLOAD FILE?-------------
+                                //-------DOWNLOAD FILE?-------------
 
-                            PrintWriter writerDownload = null;
+                                startTimeObtain = System.currentTimeMillis();
 
-                            System.out.println("Do you want to download file? (y/n) File will be saved in 'Downloads' directory.");
-                            String download = "y";//userInput.readLine();
-                            if (download.compareToIgnoreCase("y") == 0) {
+                                PrintWriter writerDownload = null;
 
-                                System.out.println("Contacting Peer To Download File...");
-                                //Receive file below.
-                                socketForPeerServer = new Socket(serverAddress, portNumber);
-                                writerDownload = new PrintWriter(socketForPeerServer.getOutputStream());
-                                writerDownload.println(Location + fileToDownload);
-                                writerDownload.flush();
+                                System.out.println("Do you want to download file? (y/n) File will be saved in 'Downloads' directory.");
+                                String download = "y";//userInput.readLine();
+                                if (download.compareToIgnoreCase("y") == 0) {
 
-                                socketPeerServerInput = new BufferedReader(new InputStreamReader(socketForPeerServer.getInputStream()));
+                                    System.out.println("Contacting Peer To Download File...");
+                                    //Receive file below.
+                                    socketForPeerServer = new Socket(serverAddress, portNumber);
+                                    writerDownload = new PrintWriter(socketForPeerServer.getOutputStream());
+                                    writerDownload.println(Location + fileToDownload);
+                                    writerDownload.flush();
 
-                                byte[] byteArray = new byte[1];
-                                int bytesRead;
-                                input = socketForPeerServer.getInputStream();
-                                byteOutputStream = new ByteArrayOutputStream();
-                                if (input != null) {
+                                    socketPeerServerInput = new BufferedReader(new InputStreamReader(socketForPeerServer.getInputStream()));
 
-                                    BufferedOutputStream bufferedOStream = null;
-                                    try {
-                                        bufferedOStream = new BufferedOutputStream(new FileOutputStream(FILE_DOWNLOAD_LOCATION_copy));
-                                        bytesRead = input.read(byteArray, 0, byteArray.length);
+                                    byte[] byteArray = new byte[1];
+                                    int bytesRead;
+                                    input = socketForPeerServer.getInputStream();
+                                    byteOutputStream = new ByteArrayOutputStream();
+                                    if (input != null) {
 
-                                        do {
-                                            byteOutputStream.write(byteArray, 0, byteArray.length);
-                                            bytesRead = input.read(byteArray);
-                                        } while (bytesRead != -1);
+                                        BufferedOutputStream bufferedOStream = null;
+                                        try {
+                                            bufferedOStream = new BufferedOutputStream(new FileOutputStream(FILE_DOWNLOAD_LOCATION_copy));
+                                            bytesRead = input.read(byteArray, 0, byteArray.length);
 
-                                        bufferedOStream.write(byteOutputStream.toByteArray());
-                                        bufferedOStream.flush();
-                                        //bufferedOStream.close();
-                                        //socketForPeerServer.close();
-                                        //String peerServerInput = socketPeerServerInput.readLine();
-                                        //System.out.println(peerServerInput);
+                                            do {
+                                                byteOutputStream.write(byteArray, 0, byteArray.length);
+                                                bytesRead = input.read(byteArray);
+                                            } while (bytesRead != -1);
 
-                                    } catch (IOException e) {
+                                            bufferedOStream.write(byteOutputStream.toByteArray());
+                                            bufferedOStream.flush();
+                                            //bufferedOStream.close();
+                                            //socketForPeerServer.close();
+                                            //String peerServerInput = socketPeerServerInput.readLine();
+                                            //System.out.println(peerServerInput);
 
+                                        } catch (IOException e) {
+
+                                        }
                                     }
+
                                 }
 
-                            }
+                                endTimeObtain = System.currentTimeMillis();
+                                timeTakenObtain = endTimeObtain - startTimeObtain;
+                                timeTakenObtainList.add(timeTakenObtain);
 
                             }
 
@@ -262,6 +301,7 @@ public class Peer_AUTO {
 
 
                 }
+                averageTimeTakenForOps(timeTakenRegisterList, timeTakenSearchList, timeTakenObtainList);
                 System.out.println("Client closing connection.");
 
             } catch (IOException e) {
@@ -288,7 +328,30 @@ public class Peer_AUTO {
 
         }
 
+        private void averageTimeTakenForOps(ArrayList<Long> timeTakenRegisterList, ArrayList<Long> timeTakenSearchList, ArrayList<Long> timeTakenObtainList) {
+            long averageTimeRegister = 0;
+            long averageTimeSearch = 0;
+            long averageTimeObtain = 0;
 
+            for (int i = 0; i < timeTakenRegisterList.size(); i++) {
+                averageTimeRegister += timeTakenRegisterList.get(i);
+            }
+            averageTimeRegister = averageTimeRegister / 1000;
+
+            for (int i = 0; i < timeTakenSearchList.size(); i++) {
+                averageTimeSearch += timeTakenSearchList.get(i);
+            }
+            averageTimeSearch = averageTimeSearch / 1000;
+
+            for (int i = 0; i < timeTakenObtainList.size(); i++) {
+                averageTimeObtain += timeTakenObtainList.get(i);
+            }
+            averageTimeObtain = averageTimeObtain / 1000;
+
+            System.out.println("Average Registration Time: "+ averageTimeRegister+" milliseconds.");
+            System.out.println("Average Search Time: "+averageTimeSearch+" milliseconds.");
+            System.out.println("Average Obtain(Download) Time: "+averageTimeObtain+" milliseconds.");
+        }
 
 
         private void handleServerResult(String messageFromServer) {
@@ -299,16 +362,17 @@ public class Peer_AUTO {
             System.out.println("The Following Clients have the File:");
 
             String[] fileLocations = messageFromServer.split("!");
-            for(String oneRecord: fileLocations){
+            for (String oneRecord : fileLocations) {
                 //System.out.println(oneRecord);
                 /*if(processedRecords.contains(oneRecord))continue;
                 processedRecords.add(oneRecord);*/
 
                 String[] fields = oneRecord.split("#");
                 try {
-                    System.out.println("Client ID: "+fields[1]/*.substring(4,5)*/+" Port: "+fields[2]+" Location: "+fields[3]+" File Name: "+fields[4]);
+                    System.out.println("Client ID: " + fields[1]/*.substring(4,5)*/ + " Port: " + fields[2] + " Location: " + fields[3] + " File Name: " + fields[4]);
 
-                }catch (ArrayIndexOutOfBoundsException e){}
+                } catch (ArrayIndexOutOfBoundsException e) {
+                }
                 // clientIdToPort.put(Integer.parseInt(fields[0]), Integer.parseInt(fields[1]));
                 // portToLocation.put(Integer.parseInt(fields[1]), fields[2]);
             }
@@ -416,14 +480,14 @@ public class Peer_AUTO {
                 if (output != null) {
                     //fullFileAddress = fullFileAddress.substring(9);
                     File file = new File(fullFileAddress);
-                    System.out.println("File Address: "+ fullFileAddress);
+                    System.out.println("File Address: " + fullFileAddress);
                     byte[] byteArray = new byte[(int) file.length()];
 
                     FileInputStream fileInputStream = null;
 
-                    try{
+                    try {
                         fileInputStream = new FileInputStream(file);
-                    }catch (FileNotFoundException e){
+                    } catch (FileNotFoundException e) {
                         System.out.println("File Not Found.");
                     }
 
@@ -447,7 +511,7 @@ public class Peer_AUTO {
 
                 }
 
-            }finally {
+            } finally {
 
             }
         }
