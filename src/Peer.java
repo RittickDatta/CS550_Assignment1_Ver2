@@ -8,6 +8,14 @@ import java.util.*;
 /**
  * Created by rittick on 1/17/17.
  */
+
+/***
+ * --------------THIS IS THE MAIN PEER CLASS--------------------------------------
+ * ---------THIS PEER CLASS ALLOWS INTERACTIVE SESSION----------------------------
+ * The other two peer classes: "Peer_Auto" and "Peer_Auto_Concurrent" are same as this class.
+ * The other two peer classes are hardcoded for testing purpose.
+ */
+
 public class Peer {
     private static int PEER_SERVER_PORT;
     private static String PEER_CLIENT_FILE_LOCATION;
@@ -22,6 +30,23 @@ public class Peer {
 
     }
 
+    /***
+     * In the main method, the program asks user two pieces of information to configure:
+     * 1. The port where the peer server will run
+     * 2. "Node number" (FOR E.G. Node1, Node2 and Node3)
+     *
+     * PLEASE NOTE THAT ENTERING THE NODE NUMBER (I.E. "Node1", "Node2 and "Node3" in case of 3 peers) IS CRITICAL
+     * FOR SUCCESSFUL EXECUTION OF THE PROGRAM
+     *
+     * NOTE: "Node number" IS CASE-SENSITIVE.
+     *
+     * "NODE1" OR "node1" is WRONG.
+     *
+     * "Node1" IS RIGHT
+     *
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
 
 
@@ -70,6 +95,10 @@ public class Peer {
 
     }
 
+    /***
+     * The method creates the client side of the peer using the following class. It extends thread.
+     * This class can make requests to 1. Register 2. Search and 3. Obtain files
+     */
     private static class PeerClient extends Thread {
         InetAddress serverAddress;
         int serverPort;
@@ -282,8 +311,11 @@ public class Peer {
         }
 
 
-
-
+        /***
+         * This method parses the search result from the server and displays to the user in a
+         * friendly format.
+         * @param messageFromServer
+         */
         private void handleServerResult(String messageFromServer) {
 
             ArrayList<String> processedRecords = new ArrayList<>();
@@ -307,6 +339,11 @@ public class Peer {
             }
         }
 
+        /***
+         * This method collects file data at a given location and sends to the caller.
+         * @param path
+         * @return
+         */
         public static String getFileData(String path) {
             String fileData = "";
             File file = new File(path);
@@ -316,6 +353,11 @@ public class Peer {
             return fileData;
         }
 
+        /***
+         * This method displays options to the user.
+         * @return
+         * @throws IOException
+         */
         public static String selectOption() throws IOException {
             String option;
             BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
@@ -334,6 +376,9 @@ public class Peer {
 
     }
 
+    /***
+     * This class is the server side of the peer. It primarily handles "obtain" requests.
+     */
     private static class PeerServer extends Thread {
         private ArrayList<String> fileNamesRegister = new ArrayList<String>();
 

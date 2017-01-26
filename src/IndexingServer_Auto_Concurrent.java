@@ -10,6 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by rittick on 1/25/17.
  */
+
+/**
+ * -------------------------THIS CLASS IS SAME AS "IndexingServer" WITH AUTOMATION FOR TESTING PURPOSE----
+ * This class is used in the test case when 3 Peers make 1000 request each to the server.
+ */
 public class IndexingServer_Auto_Concurrent {
 
     private static final int SERVER_PORT = 3000;

@@ -7,6 +7,11 @@ import java.util.*;
 /**
  * Created by rittick on 1/25/17.
  */
+
+/***
+ * -------THIS CLASS IS SAME AS "Peer" WITH AUTOMATION FOR TESTING PURPOSE
+ * This class is used in the test case when 3 peers make 1000 requests each( a total of 3000 request).
+ */
 public class Peer_Auto_Concurrent {
 
     private static int PEER_SERVER_PORT;

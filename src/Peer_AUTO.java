@@ -7,6 +7,15 @@ import java.util.*;
 /**
  * Created by rittick on 1/24/17.
  */
+
+/***
+ * ----------------THIS CLASS IS SAME AS "Peer" WITH AUTOMATION FOR TESTING PURPOSE----------------
+ * This class is used in the test case when 1 peer makes a 1000 requests to the server.
+ * It calculates and displays the average time taken to
+ * 1. Register
+ * 2. Search
+ * 3. Obtain
+ */
 public class Peer_AUTO {
     private static int PEER_SERVER_PORT;
     private static String PEER_CLIENT_FILE_LOCATION;

@@ -11,8 +11,20 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by rittick on 1/17/17.
  */
+
+/**
+ * -------------------THIS IS THE MAIN SERVER CLASS-------------------------
+ * The other two indexing server classes: IndexingServer_Auto and IndexingServer_Auto_Concurrent make use of code in this file.
+ * The other two indexing server classes are hardcoded for testing purposes.
+ */
 public class IndexingServer {
 
+    /**
+     * I use ConcurrentHashMap to avoid deadlock and inconsistency.
+     * "bigRegister" is the primary data structure for storage. In "bigRegister", the key is "serialNumber", it is an integer assigned 1;
+     * The value is a concatenated string storing: Client ID, Port, Location and File Name
+     * I parse this string while searching for files.
+     */
     private static final int SERVER_PORT = 3000;
     private static ConcurrentHashMap<Integer, ArrayList<String>> clientIdToFilename = new ConcurrentHashMap<Integer, ArrayList<String>>();
     private static ConcurrentHashMap<Integer, String> clientIdToFileLocation = new ConcurrentHashMap<Integer, String>();
@@ -40,6 +52,9 @@ public class IndexingServer {
         }
     }
 
+    /**
+     * Each time the server receives a request, it spawns a new thread of this class.
+     */
     private static class ServerThread extends Thread {
         private int clientID;
         private Socket connection;
@@ -153,6 +168,11 @@ public class IndexingServer {
             }
         }
 
+        /**
+         * This method unregisters files of a particular client.
+         * @param clientID
+         * @return a boolean value indicating if files were successfully unregistered
+         */
         private Boolean unregister(int clientID) {
             boolean unregistered = false;
 
@@ -179,11 +199,22 @@ public class IndexingServer {
             return "";
         }*/
 
+        /**
+         * This method maps the client ID to the server port number. This information is used in Search operation
+         * to build search result string.
+         * @param clientID
+         * @param clientServersPort
+         */
         private void saveClientsServerPort(int clientID, int clientServersPort) {
             clientIdToPeerServer.put(clientID, clientServersPort);
             System.out.println("Peer's Server Port Saved.");
         }
 
+        /**
+         * This method makes use of the mapping of client ID to server port and returns the port number.
+         * @param clientID
+         * @return port number
+         */
         private int getPort(int clientID){
             for(Integer key: clientIdToPeerServer.keySet()){
                 if( key == clientID){
@@ -194,6 +225,12 @@ public class IndexingServer {
             return 0;
         }
 
+        /**
+         * This method handles registration request of a client.
+         * @param clientID
+         * @param fileData
+         * @return a boolean value indicating if the files were successfully registered
+         */
         public boolean registry(int clientID, String fileData) {
             //Enter data into CHM
             boolean finalFlag = false;
@@ -238,6 +275,10 @@ public class IndexingServer {
             return finalFlag;
         }
 
+        /**
+         * This method is used to check "bigRegister" when a client who has already registered tries to re-register.
+         * @param clientID
+         */
         private void checkRegister(int clientID) {
 
             for(Integer key: bigRegister.keySet()){
@@ -257,6 +298,11 @@ public class IndexingServer {
 
         }
 
+        /**
+         * This method searches for files in "bigRegister"
+         * @param fileName
+         * @return
+         */
         public String search(String fileName) {
             /*for(Integer key : clientIdToFilename.keySet()){
                 ArrayList<String> files = clientIdToFilename.get(key);
