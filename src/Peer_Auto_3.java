@@ -2,21 +2,13 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
- * Created by rittick on 1/24/17.
+ * Created by rittick on 1/26/17.
  */
-
-/***
- * ----------------THIS CLASS IS SAME AS "Peer" WITH AUTOMATION FOR TESTING PURPOSE----------------
- * This class is used in the test case when 1 peer makes a 1000 requests to the server.
- * It calculates and displays the average time taken to
- * 1. Register
- * 2. Search
- * 3. Obtain
- */
-public class Peer_AUTO {
+public class Peer_Auto_3 {
     private static int PEER_SERVER_PORT;
     private static String PEER_CLIENT_FILE_LOCATION;
     private static String FILE_LOCATION = "/Myfiles/";
@@ -26,7 +18,7 @@ public class Peer_AUTO {
     private static String filesOfThisNode = null;
     private static Boolean registeredOnce = false;
 
-    public Peer_AUTO() {
+    public Peer_Auto_3() {
 
     }
 
@@ -41,7 +33,7 @@ public class Peer_AUTO {
             System.out.println("Peer Server Preparing to Start...");
             System.out.println("Enter Port Number for Peer Server:");
             BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
-            PEER_SERVER_PORT = Integer.parseInt("4000");//Integer.parseInt(userInput.readLine());
+            PEER_SERVER_PORT = Integer.parseInt("4002");//Integer.parseInt(userInput.readLine());
 
             int clientID = 1;
             ServerSocket peerServer = new ServerSocket(PEER_SERVER_PORT);
@@ -52,7 +44,7 @@ public class Peer_AUTO {
 
             InetAddress serverAddress = InetAddress.getLocalHost();
             System.out.println("Enter Node Number for Peer: (e.g. Node1, Node2 etc.)");
-            PEER_CLIENT_FILE_LOCATION = "Node1";//userInput.readLine();
+            PEER_CLIENT_FILE_LOCATION = "Node3";//userInput.readLine();
             System.out.println();
             PEER_CLIENT_FILE_LOCATION += "/Myfiles/";
             // System.out.println("Enter Download Location for Peer:");
@@ -62,13 +54,13 @@ public class Peer_AUTO {
             // System.out.println(FILE_LOCATION);
             System.out.println("Peer Client is Running...");
             System.out.println();
-            new PeerClient(serverAddress, 3000, PEER_CLIENT_FILE_LOCATION, PEER_SERVER_PORT).start();
+            new Peer_Auto_3.PeerClient_3(serverAddress, 3000, PEER_CLIENT_FILE_LOCATION, PEER_SERVER_PORT).start();
 
             //-----------------------------------------------------
 
             while (true) {
                 Socket newConnection = peerServer.accept();
-                new PeerServer(clientID, newConnection).start();
+                new Peer_Auto_3.PeerServer_3(clientID, newConnection).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -78,7 +70,7 @@ public class Peer_AUTO {
 
     }
 
-    private static class PeerClient extends Thread {
+    private static class PeerClient_3 extends Thread {
         InetAddress serverAddress;
         int serverPort;
         Socket socket = null;
@@ -112,7 +104,7 @@ public class Peer_AUTO {
         ArrayList<Long> timeTakenSearchList = new ArrayList<>();
         ArrayList<Long> timeTakenObtainList = new ArrayList<>();
 
-        public PeerClient(InetAddress serverAddress, int serverPort, String peerFileLocation, int peerServerPort) {
+        public PeerClient_3(InetAddress serverAddress, int serverPort, String peerFileLocation, int peerServerPort) {
             this.serverAddress = serverAddress;
             this.serverPort = serverPort;
             this.peerFileLocation = peerFileLocation;
@@ -413,7 +405,7 @@ public class Peer_AUTO {
 
     }
 
-    private static class PeerServer extends Thread {
+    private static class PeerServer_3 extends Thread {
         private ArrayList<String> fileNamesRegister = new ArrayList<String>();
 
         private int clientId;
@@ -423,7 +415,7 @@ public class Peer_AUTO {
         private BufferedOutputStream output;
         private BufferedInputStream fileInputStream;
 
-        public PeerServer(int clientId, Socket connection) {
+        public PeerServer_3(int clientId, Socket connection) {
             this.clientId = clientId;
             this.connection = connection;
 
